@@ -1,0 +1,24 @@
+Player {
+    width: 25;
+    border-right: ascii red;
+}
+
+MediaPlayer {
+    width: 100%;
+    height: 6;
+
+    border-bottom: solid pink;
+}
+
+.text-center {
+    content-align: center middle;
+    height: 1;
+    margin-top: 1;
+}
+
+.playing {
+    text-style: reverse;
+}
+
+.blue { border-right: solid blue }
+.pink { border-right: solid pink }
