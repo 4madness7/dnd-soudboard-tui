@@ -1,7 +1,7 @@
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, ScrollableContainer
 
-from ui.player import Player
+from ui.player import Player, SongStatus
 
 class DNDSoundBoard(App):
 
@@ -21,6 +21,9 @@ class DNDSoundBoard(App):
             )
 
     def action_test(self) -> None:
-        player = self.query("#media-player")
+        player = self.query_one(SongStatus)
         player.toggle_class("playing")
-
+        if "playing" in player.classes:
+            player.status = "Playing"
+        else:
+            player.status = "Paused"
