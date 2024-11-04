@@ -2,6 +2,7 @@ from textual.app import App, ComposeResult
 from textual.containers import Horizontal, ScrollableContainer
 
 from ui.player import Player, SongStatus
+from ui.playlists import Playlists
 
 class DNDSoundBoard(App):
 
@@ -15,8 +16,7 @@ class DNDSoundBoard(App):
     def compose(self) -> ComposeResult:
         yield Horizontal(
                 Player(),
-                ScrollableContainer(classes="blue"),
-                ScrollableContainer(classes="pink"),
+                Playlists(classes="blue"),
                 ScrollableContainer(),
             )
 

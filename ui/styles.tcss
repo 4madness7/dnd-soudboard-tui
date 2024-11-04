@@ -30,7 +30,7 @@ QueuedSong {
     height: 3;
 }
 
-SongQueue {
+SongQueue, Playlists {
     scrollbar-size-vertical: 1;
 }
 
