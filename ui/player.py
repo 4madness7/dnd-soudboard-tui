@@ -1,11 +1,13 @@
 from textual.app import ComposeResult
 from textual.containers import ScrollableContainer, Vertical
 from textual.widget import Widget
+from textual.widgets import Static
 from textual.reactive import reactive
 
 class Player(Vertical):
     def compose(self) -> ComposeResult:
         yield MediaPlayer()
+        yield SongQueue()
 
 class MediaPlayer(Vertical):
 
@@ -26,3 +28,15 @@ class SongStatus(Widget):
 
     def render(self) -> str:
         return f"{self.status}"
+
+class SongQueue(ScrollableContainer):
+    def compose(self) -> ComposeResult:
+        for i in range(16):
+            if i == 7:
+                yield QueuedSong(classes="queue-active")
+            else:
+                yield QueuedSong()
+
+class QueuedSong(Widget):
+    def compose(self) -> ComposeResult:
+        yield Static("SONG QUEUED")

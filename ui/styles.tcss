@@ -20,5 +20,19 @@ MediaPlayer {
     text-style: reverse;
 }
 
+.queue-active {
+    border: round white;
+}
+
+QueuedSong {
+    border: round green;
+    width: 100%;
+    height: 3;
+}
+
+SongQueue {
+    scrollbar-size-vertical: 1;
+}
+
 .blue { border-right: solid blue }
 .pink { border-right: solid pink }
