@@ -1,3 +1,25 @@
+Screen {
+    align: center middle;
+    layers: l1 l2;
+}
+
+.l1 {
+    layer: l1;
+}
+
+.l2 {
+    layer: l2;
+}
+
+.none {
+    display: none;
+}
+
+.block {
+    display: block;
+}
+
+
 Player {
     width: 25;
     border-right: ascii red;
@@ -44,6 +66,16 @@ SoundEffects {
 .effect {
     height: 3;
     border: round white;
+}
+
+InputFile {
+    width: 70%;
+    height: 3;
+    border: tall white;
+}
+
+InputFile:focus {
+    border: tall red;
 }
 
 .blue { border-right: solid blue }
