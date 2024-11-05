@@ -24,7 +24,10 @@ class DNDSoundBoard(App):
                 SoundEffects(),
                 classes="l1"
             )
-        yield InputFile(classes="l2 none")
+        yield InputFile(
+                placeholder="Insert file path here (press ENTER to submit)",
+                classes="l2 none"
+            )
 
     def action_test(self) -> None:
         player = self.query_one(SongStatus)
