@@ -30,8 +30,20 @@ QueuedSong {
     height: 3;
 }
 
-SongQueue, Playlists {
+SongQueue, Playlists, SoundEffects{
     scrollbar-size-vertical: 1;
+}
+
+SoundEffects {
+    width: 32;
+    layout: grid;
+    grid-size: 2;
+    grid-rows: 3;
+}
+
+.effect {
+    height: 3;
+    border: round white;
 }
 
 .blue { border-right: solid blue }
