@@ -1,3 +1,4 @@
+import pickle
 import subprocess, os
 from consts import MEDIA_PATH
 
@@ -18,6 +19,10 @@ class Data():
 
     def copy(self):
         return Data(self.songs, self.playlists, self.soundboard)
+
+    def add_song(self, file_name: str) -> None:
+        self.songs.append(Song(file_name))
+        self.songs.sort()
 
 
 class Song():

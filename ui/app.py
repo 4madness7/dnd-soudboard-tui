@@ -33,6 +33,7 @@ class DNDSoundBoard(App):
                 classes="l1"
             )
         yield InputFile(
+                data=self.data,
                 placeholder="Insert file path here (press ENTER to submit)",
                 classes="l2 none"
             )

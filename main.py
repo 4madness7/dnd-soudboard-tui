@@ -30,7 +30,7 @@ def main():
 
     for i in range(len(media_files)):
         if media_files[i] not in file_saved:
-            new_data.songs.append(Song(media_files[i]))
+            new_data.add_song(media_files[i])
 
     new_data.songs.sort()
 

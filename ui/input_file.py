@@ -1,11 +1,16 @@
+import pickle
 from textual.widgets import Input
 from textual.events import Hide
 import os
 
-from consts import FORMATS
+from consts import DATA_PATH, FORMATS
+from data import Data
 from utils import copy_file
 
 class InputFile(Input):
+    def __init__(self, data: Data,  placeholder: str = "", classes: str | None = None) -> None:
+        self.data = data
+        super().__init__(None, placeholder, None, False, classes=classes)
 
     valid_empty = True
 
@@ -31,9 +36,14 @@ class InputFile(Input):
             for file_name in media_files:
                 copied, new_path = copy_file(os.path.join(input_path, file_name))
                 if copied:
+                    self.data.add_song(file_name)
                     count_saved += 1
                 else:
                     self.app.notify(f"File \"{new_path}\" already exists", severity="error")
+
+            if count_saved > 0:
+                pickle.dump(self.data, open(DATA_PATH, "wb+"))
+
             self.app.notify(
                 f"Successfully copied {count_saved} audio files out of {len(media_files)}.",
                 severity="information"
@@ -41,6 +51,9 @@ class InputFile(Input):
         elif is_file and is_audio_file:
             copied, new_path = copy_file(input_path)
             if copied:
+                self.data.add_song(new_path.split(os.sep)[-1])
+                pickle.dump(self.data, open(DATA_PATH, "wb+"))
+
                 self.app.notify(
                     f"Successfully copied audio from \"{input_path}\" to \"{new_path}\"",
                     severity="information"
