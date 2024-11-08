@@ -1,46 +1,21 @@
 from textual.app import ComposeResult
 from textual.containers import ScrollableContainer
-from textual.widgets import Static, Collapsible
+from textual.widget import Widget
+from textual.widgets import DataTable, Collapsible
+from data import Data
 
 class Playlists(ScrollableContainer):
+    def __init__(self, data: Data, *children: Widget, name: str | None = None, id: str | None = None, classes: str | None = None, disabled: bool = False) -> None:
+        self.data = data
+        super().__init__(*children, name=name, id=id, classes=classes, disabled=disabled)
+
     def compose(self) -> ComposeResult:
-        with Collapsible(title="Playlist", collapsed=False):
-            yield Static("1. Song 1")
-            yield Static("2. Song 2")
-            yield Static("3. Song 3")
-            yield Static("4. Song 4")
-            yield Static("5. Song 5")
-            yield Static("6. Song 6")
-            yield Static("7. Song 7")
-            yield Static("8. Song 8")
-            yield Static("9. Song 9")
-        with Collapsible(title="Playlist", collapsed=False):
-            yield Static("1. Song 1")
-            yield Static("2. Song 2")
-            yield Static("3. Song 3")
-            yield Static("4. Song 4")
-            yield Static("5. Song 5")
-            yield Static("6. Song 6")
-            yield Static("7. Song 7")
-            yield Static("8. Song 8")
-            yield Static("9. Song 9")
-        with Collapsible(title="Playlist", collapsed=False):
-            yield Static("1. Song 1")
-            yield Static("2. Song 2")
-            yield Static("3. Song 3")
-            yield Static("4. Song 4")
-            yield Static("5. Song 5")
-            yield Static("6. Song 6")
-            yield Static("7. Song 7")
-            yield Static("8. Song 8")
-            yield Static("9. Song 9")
-        with Collapsible(title="Playlist", collapsed=False):
-            yield Static("1. Song 1")
-            yield Static("2. Song 2")
-            yield Static("3. Song 3")
-            yield Static("4. Song 4")
-            yield Static("5. Song 5")
-            yield Static("6. Song 6")
-            yield Static("7. Song 7")
-            yield Static("8. Song 8")
-            yield Static("9. Song 9")
+        with Collapsible(title="Saved audios", collapsed=False):
+            table = DataTable(cursor_type="row")
+            table.styles.width = "90%"
+            table.add_columns("Name", "Duration")
+            for song in self.data.songs:
+                table.add_row(song.name, song.duration)
+
+            yield table
+
