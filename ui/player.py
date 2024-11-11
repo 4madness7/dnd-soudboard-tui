@@ -34,8 +34,10 @@ class SongStatus(Widget):
 
 class SongQueue(ScrollableContainer):
     BINDINGS = [
-        Binding("down,j", "move_focus('down')", "Focus to next song", show=False),
-        Binding("up,k", "move_focus('up')", "Focus to previous song", show=False),
+        Binding("down,j", "move_focus('down', 'short')", "Focus to next song", show=False),
+        Binding("up,k", "move_focus('up', 'short')", "Focus to previous song", show=False),
+        Binding("ctrl+down,ctrl+d", "move_focus('down', 'long')", "Focus to the 4th song after", show=False),
+        Binding("ctrl+up,ctrl+u", "move_focus('up', 'long')", "Focus to the 4th song before", show=False),
     ]
 
     focused_child = 0
@@ -51,16 +53,22 @@ class SongQueue(ScrollableContainer):
         self.children[self.focused_child].focus()
         return super()._on_focus(event)
 
-    def action_move_focus(self, direction: Literal["up", "down"] ) -> None:
+    def action_move_focus(self, direction: Literal["up", "down"], skip: Literal["short", "long"]) -> None:
         state = self.query("Button")
         i = 0
         while not state.nodes[i].has_focus:
             if i >= len(state.nodes) - 1:
                 break
             i += 1
+        jump = 0
+        match (skip):
+            case 'short':
+                jump = 1
+            case 'long':
+                jump = 4
         match (direction):
             case 'down':
-                self.focused_child = (i + 1) % len(state.nodes)
+                self.focused_child = (i + jump) % len(state.nodes)
             case 'up':
-                self.focused_child = (i - 1) % len(state.nodes)
+                self.focused_child = (i - jump) % len(state.nodes)
         state.nodes[self.focused_child].focus()
