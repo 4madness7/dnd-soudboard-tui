@@ -3,7 +3,7 @@ from textual.containers import Horizontal
 
 from data import Data
 from ui.input_file import InputFile
-from ui.player import Player, SongStatus
+from ui.player import Player, SongQueue, SongStatus
 from ui.playlists import Playlists
 from ui.sound_effects import SoundEffects
 
@@ -19,6 +19,10 @@ class DNDSoundBoard(App):
 
             ("space", "test", "TEST"),
             ("ctrl+n", "toggle_input_file", "Open/close input file"),
+
+            ("ctrl+q", "focus_queue", "Put focus on the queue pane"),
+            # ("ctrl+p", "focus_playlist", "Put focus on the playlist pane"),
+            # ("ctrl+s", "focus_soundboard", "Put focus on the soundboard pane"),
         ]
 
     def compose(self) -> ComposeResult:
@@ -47,3 +51,7 @@ class DNDSoundBoard(App):
         input_file.toggle_class("none")
         if not input_file.has_class("none"):
             input_file.focus()
+
+    def action_focus_queue(self) -> None:
+        self.query_one(SongQueue).focus()
+

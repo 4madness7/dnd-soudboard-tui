@@ -80,3 +80,11 @@ InputFile:focus {
 
 .blue { border-right: solid blue }
 .pink { border-right: solid pink }
+
+SongQueue:focus-within {
+    background: black;
+}
+
+SongQueue:focus-within > Button:focus {
+    background: red;
+}
