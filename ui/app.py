@@ -23,7 +23,7 @@ class DNDSoundBoard(App):
 
             ("ctrl+q", "focus_queue", "Put focus on the queue pane"),
             Binding("ctrl+p", "focus_playlist", "Put focus on the playlist pane", priority=True),
-            # ("ctrl+s", "focus_soundboard", "Put focus on the soundboard pane"),
+            ("ctrl+s", "focus_soundboard", "Put focus on the soundboard pane"),
         ]
 
     def compose(self) -> ComposeResult:
@@ -58,3 +58,6 @@ class DNDSoundBoard(App):
 
     def action_focus_playlist(self) -> None:
         self.query_one(Playlists).focus()
+
+    def action_focus_soundboard(self) -> None:
+        self.query_one(SoundEffects).focus()

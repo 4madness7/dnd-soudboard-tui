@@ -92,3 +92,7 @@ SongQueue:focus-within > Button:focus {
 Playlists:focus-within {
     background: black;
 }
+
+SoundEffects:focus-within > Button:focus {
+    background: red;
+}
