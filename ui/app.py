@@ -1,4 +1,5 @@
 from textual.app import App, ComposeResult
+from textual.binding import Binding
 from textual.containers import Horizontal
 
 from data import Data
@@ -21,7 +22,7 @@ class DNDSoundBoard(App):
             ("ctrl+n", "toggle_input_file", "Open/close input file"),
 
             ("ctrl+q", "focus_queue", "Put focus on the queue pane"),
-            # ("ctrl+p", "focus_playlist", "Put focus on the playlist pane"),
+            Binding("ctrl+p", "focus_playlist", "Put focus on the playlist pane", priority=True),
             # ("ctrl+s", "focus_soundboard", "Put focus on the soundboard pane"),
         ]
 
@@ -55,3 +56,5 @@ class DNDSoundBoard(App):
     def action_focus_queue(self) -> None:
         self.query_one(SongQueue).focus()
 
+    def action_focus_playlist(self) -> None:
+        self.query_one(Playlists).focus()
