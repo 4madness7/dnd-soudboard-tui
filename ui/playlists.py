@@ -23,16 +23,11 @@ class Playlists(ScrollableContainer):
         super().__init__(*children, name=name, id=id, classes=classes, disabled=disabled)
 
     def compose(self) -> ComposeResult:
-        table = DataTable(cursor_type="row")
-        table.styles.width = "100"
-        table.add_columns("Name", "Duration")
-        for song in self.data.songs:
-            if len(song.name) > 86:
-                table.add_row(song.name[:83]+"...", song.duration)
-            else:
-                table.add_row(song.name, song.duration)
-
-        yield PlaylistCollapsible(table, title="Saved audios")
+        yield PlaylistCollapsible(
+            self.data,
+            list(range(0, len(self.data.songs))),
+            title="Saved audios"
+        )
 
     def action_move_focus(self, direction: Literal["up", "down"], skip: Literal["short", "long"]) -> None:
         state = self.query(PlaylistCollapsibleTitle)
@@ -66,7 +61,7 @@ class PlaylistCollapsible(Collapsible):
         Binding("n", "move_focus_song('down')", "Focus to next song in table", show=False),
     ]
 
-    def __init__(self, *children: Widget, title: str = "Toggle", collapsed: bool = True, collapsed_symbol: str = "▶", expanded_symbol: str = "▼", name: str | None = None, id: str | None = None, classes: str | None = None, disabled: bool = False) -> None:
+    def __init__(self, data: Data, to_render: list[int], *children: Widget, title: str = "Toggle", collapsed: bool = True, collapsed_symbol: str = "▶", expanded_symbol: str = "▼", name: str | None = None, id: str | None = None, classes: str | None = None, disabled: bool = False) -> None:
         super().__init__(*children, title=title, collapsed=collapsed, collapsed_symbol=collapsed_symbol, expanded_symbol=expanded_symbol, name=name, id=id, classes=classes, disabled=disabled)
         self._title = PlaylistCollapsibleTitle(
             label=title,
@@ -74,16 +69,27 @@ class PlaylistCollapsible(Collapsible):
             expanded_symbol=expanded_symbol,
             collapsed=collapsed,
         )
+        self.data = data
+        self._table = DataTable(cursor_type="row")
+        self._table.styles.width = "100"
+        self._table.add_columns("Name", "Duration")
+        for i in to_render:
+            if len(self.data.songs[i].name) > 86:
+                self._table.add_row(self.data.songs[i].name[:83]+"...", self.data.songs[i].duration)
+            else:
+                self._table.add_row(self.data.songs[i].name, self.data.songs[i].duration)
+
+        self.compose_add_child(self._table)
+
 
     def action_move_focus_song(self, direction: Literal["up", "down"]) -> None:
-        table = self.query_one(DataTable)
         match (direction):
             case 'down':
-                new_row = (table.cursor_coordinate.row + 1) % len(table.rows)
-                table.cursor_coordinate = Coordinate(new_row, 0)
+                new_row = (self._table.cursor_coordinate.row + 1) % len(self._table.rows)
+                self._table.cursor_coordinate = Coordinate(new_row, 0)
             case 'up':
-                new_row = (table.cursor_coordinate.row - 1) % len(table.rows)
-                table.cursor_coordinate = Coordinate(new_row, 0)
+                new_row = (self._table.cursor_coordinate.row - 1) % len(self._table.rows)
+                self._table.cursor_coordinate = Coordinate(new_row, 0)
 
     def _on_focus(self, event: Focus) -> None:
         self.children[0].focus()
