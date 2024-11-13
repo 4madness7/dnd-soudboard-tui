@@ -1,9 +1,9 @@
-import pickle
 import subprocess, os
+from typing import Literal
 from consts import MEDIA_PATH
 
 class Data():
-    def __init__(self, songs = [], playlists = {}, soundboard = []) -> None:
+    def __init__(self, songs = {}, playlists = {}, soundboard = []) -> None:
         self.songs = songs
         self.playlists = playlists
         self.soundboard = soundboard
@@ -17,19 +17,45 @@ class Data():
             "}"
         )
 
+    def __eq__(self, value) -> bool:
+        return (
+            self.songs == value.songs and
+            self.playlists == value.playlists and
+            self.soundboard == value.soundboard
+        )
+
     def copy(self):
-        return Data(self.songs, self.playlists, self.soundboard)
+        return Data(
+            self.songs.copy(),
+            self.playlists.copy(),
+            self.soundboard.copy()
+        )
 
     def add_song(self, file_name: str) -> None:
-        self.songs.append(Song(file_name))
-        self.songs.sort()
+        new_key = 0
+        if len(self.songs) > 0:
+            new_key = list(self.songs.keys())[-1] + 1
+        self.songs.update({ new_key: Song(file_name=file_name) })
+
+    def get_key(self, arg: Literal["name", "file_name"], key: str) -> int:
+        match (arg):
+            case "name":
+                lst = dict(map(lambda kv: (kv[1].name, kv[0]), self.songs.items()))
+            case "file_name":
+                lst = dict(map(lambda kv: (kv[1].file_name, kv[0]), self.songs.items()))
+        return lst[key]
+
+    def remove_song(self, key: int) -> None:
+        self.songs.pop(key)
 
 
 class Song():
-    def __init__(self, file_name: str = "") -> None:
-        self.name = file_name.split(".")[0]
+    def __init__(self, name: str = "", file_name: str = "", duration: str = "XX:XX:XX") -> None:
+        self.name = name
+        if self.name == "":
+            self.name = file_name.split(".")[0]
         self.file_name = file_name
-        self.duration = "XX:XX:XX"
+        self.duration = duration
         self.calculate_audio_duration()
 
     def calculate_audio_duration(self) -> None:
@@ -39,6 +65,7 @@ class Song():
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT
         )
+        print(os.path.join(MEDIA_PATH, self.file_name))
         if res.stdout:
             duration = (res.communicate()[0]
                             .decode("utf8")
@@ -47,9 +74,12 @@ class Song():
                             .strip())
         self.duration = duration
 
+    def copy(self):
+        return Song(self.name, self.file_name, self.duration)
+
     def __str__(self) -> str:
         return (
-            "\n{\n" +
+            "{\n" +
             f"\tName: {self.name}\n" +
             f"\tFile name: {self.file_name}\n" +
             f"\tDuration: {self.duration}\n" +

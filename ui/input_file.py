@@ -30,7 +30,6 @@ class InputFile(Input):
             for f in os.listdir(input_path):
                 if os.path.isfile(os.path.join(input_path, f)) and f.split(".")[-1] in FORMATS:
                     media_files.append(f)
-            media_files.sort()
 
             count_saved = 0
             for file_name in media_files:

@@ -25,7 +25,7 @@ class Playlists(ScrollableContainer):
     def compose(self) -> ComposeResult:
         yield PlaylistCollapsible(
             self.data,
-            list(range(0, len(self.data.songs))),
+            list(self.data.songs.keys()),
             title="Saved audios"
         )
 
@@ -72,13 +72,13 @@ class PlaylistCollapsible(Collapsible):
         self.data = data
         self._table = DataTable(cursor_type="row")
         self._table.styles.width = "100"
-        self._table.add_columns("Name", "Duration")
+        name_key, _ = self._table.add_columns("Name", "Duration")
         for i in to_render:
             if len(self.data.songs[i].name) > 86:
                 self._table.add_row(self.data.songs[i].name[:83]+"...", self.data.songs[i].duration)
             else:
                 self._table.add_row(self.data.songs[i].name.ljust(86), self.data.songs[i].duration)
-
+        self._table.sort(name_key, key=lambda name: name.lower())
         self.compose_add_child(self._table)
 
 
