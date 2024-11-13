@@ -72,7 +72,7 @@ class PlaylistCollapsible(Collapsible):
         self.data = data
         self._table = DataTable(cursor_type="row")
         self._table.styles.width = "100"
-        name_key, _ = self._table.add_columns("Name", "Duration")
+        name_key, _ = self._table.add_columns("Name".ljust(88), "Duration")
         for i in to_render:
             if len(self.data.songs[i].name) > 86:
                 self._table.add_row(self.data.songs[i].name[:83]+"...", self.data.songs[i].duration)
