@@ -77,7 +77,7 @@ class PlaylistCollapsible(Collapsible):
             if len(self.data.songs[i].name) > 86:
                 self._table.add_row(self.data.songs[i].name[:83]+"...", self.data.songs[i].duration)
             else:
-                self._table.add_row(self.data.songs[i].name, self.data.songs[i].duration)
+                self._table.add_row(self.data.songs[i].name.ljust(86), self.data.songs[i].duration)
 
         self.compose_add_child(self._table)
 
