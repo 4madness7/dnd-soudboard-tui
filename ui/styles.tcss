@@ -52,7 +52,7 @@ QueuedSong {
     height: 3;
 }
 
-SongQueue, Playlists, SoundEffects{
+SongQueue, Playlists, SoundEffects, SongChecklist{
     scrollbar-size-vertical: 1;
 }
 
@@ -95,4 +95,8 @@ Playlists:focus-within {
 
 SoundEffects:focus-within > Button:focus {
     background: red;
+}
+
+AddPlaylist:focus-within {
+    background: black;
 }

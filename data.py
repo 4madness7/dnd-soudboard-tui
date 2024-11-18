@@ -65,7 +65,6 @@ class Song():
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT
         )
-        print(os.path.join(MEDIA_PATH, self.file_name))
         if res.stdout:
             duration = (res.communicate()[0]
                             .decode("utf8")

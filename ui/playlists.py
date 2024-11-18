@@ -60,6 +60,8 @@ class PlaylistCollapsible(Collapsible):
     BINDINGS = [
         Binding("p", "move_focus_song('up')", "Focus to previous song in table", show=False),
         Binding("n", "move_focus_song('down')", "Focus to next song in table", show=False),
+        # This is temporary (maybe)
+        Binding("enter", "no_bind", "Removed binding", show=False, priority=True),
     ]
 
     def __init__(self, data: Data, to_render: list[int], *children: Widget, title: str = "Toggle", collapsed: bool = True, collapsed_symbol: str = "▶", expanded_symbol: str = "▼", name: str | None = None, id: str | None = None, classes: str | None = None, disabled: bool = False) -> None:
@@ -102,6 +104,9 @@ class PlaylistCollapsible(Collapsible):
             case 'up':
                 new_row = (self._table.cursor_coordinate.row - 1) % len(self._table.rows)
                 self._table.cursor_coordinate = Coordinate(new_row, 0)
+
+    def action_no_bind(self):
+        pass
 
     def _on_focus(self, event: Focus) -> None:
         self.children[0].focus()
