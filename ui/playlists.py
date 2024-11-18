@@ -26,7 +26,8 @@ class Playlists(ScrollableContainer):
         yield PlaylistCollapsible(
             self.data,
             list(self.data.songs.keys()),
-            title="Saved audios"
+            title="Saved audios",
+            id="saved-audios",
         )
 
     def action_move_focus(self, direction: Literal["up", "down"], skip: Literal["short", "long"]) -> None:
@@ -72,15 +73,26 @@ class PlaylistCollapsible(Collapsible):
         self.data = data
         self._table = DataTable(cursor_type="row")
         self._table.styles.width = "100"
-        name_key, _ = self._table.add_columns("Name".ljust(88), "Duration")
+        self.col_key_name, _ = self._table.add_columns("Name".ljust(88), "Duration")
         for i in to_render:
             if len(self.data.songs[i].name) > 86:
                 self._table.add_row(self.data.songs[i].name[:83]+"...", self.data.songs[i].duration)
             else:
-                self._table.add_row(self.data.songs[i].name.ljust(86), self.data.songs[i].duration)
-        self._table.sort(name_key, key=lambda name: name.lower())
+                self._table.add_row(self.data.songs[i].name, self.data.songs[i].duration)
+        self._table.sort(self.col_key_name, key=lambda name: name.lower())
         self.compose_add_child(self._table)
 
+    def update_table(self):
+        indexes = list(self.data.songs.keys())
+        titles = list(map(lambda x: x.strip(), list(self._table.get_column(self.col_key_name))))
+        for i in indexes:
+            if self.data.songs[i].name not in titles:
+                if len(self.data.songs[i].name) > 86:
+                    self._table.add_row(self.data.songs[i].name[:83]+"...", self.data.songs[i].duration)
+                else:
+                    self._table.add_row(self.data.songs[i].name, self.data.songs[i].duration)
+
+        self._table.sort(self.col_key_name, key=lambda name: name.lower())
 
     def action_move_focus_song(self, direction: Literal["up", "down"]) -> None:
         match (direction):

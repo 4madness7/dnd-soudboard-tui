@@ -47,6 +47,8 @@ class InputFile(Input):
                 f"Successfully copied {count_saved} audio files out of {len(media_files)}.",
                 severity="information"
             )
+            self.app.query_one("#saved-audios").update_table()
+
         elif is_file and is_audio_file:
             copied, new_path = copy_file(input_path)
             if copied:
@@ -57,6 +59,8 @@ class InputFile(Input):
                     f"Successfully copied audio from \"{input_path}\" to \"{new_path}\"",
                     severity="information"
                 )
+                self.app.query_one("#saved-audios").update_table()
+
             else:
                 self.app.notify(f"File \"{new_path}\" already exists", severity="error")
         else:
