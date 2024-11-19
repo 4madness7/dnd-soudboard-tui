@@ -92,13 +92,14 @@ class PlaylistCollapsible(Collapsible):
         self._table.sort(self.col_key_name, key=lambda name: name.lower())
 
     def action_move_focus_song(self, direction: Literal["up", "down"]) -> None:
-        match (direction):
-            case 'down':
-                new_row = (self._table.cursor_coordinate.row + 1) % len(self._table.rows)
-                self._table.cursor_coordinate = Coordinate(new_row, 0)
-            case 'up':
-                new_row = (self._table.cursor_coordinate.row - 1) % len(self._table.rows)
-                self._table.cursor_coordinate = Coordinate(new_row, 0)
+        if self._table.row_count > 0:
+            match (direction):
+                case 'down':
+                    new_row = (self._table.cursor_coordinate.row + 1) % len(self._table.rows)
+                    self._table.cursor_coordinate = Coordinate(new_row, 0)
+                case 'up':
+                    new_row = (self._table.cursor_coordinate.row - 1) % len(self._table.rows)
+                    self._table.cursor_coordinate = Coordinate(new_row, 0)
 
     def action_no_bind(self):
         pass

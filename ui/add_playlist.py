@@ -34,30 +34,33 @@ class AddPlaylist(Vertical):
 
     def action_move_focus(self, direction: Literal["up", "down"], skip: Literal["short", "long"]) -> None:
         state = self.query(Checkbox)
-        jump = 0
-        match (skip):
-            case 'short':
-                jump = 1
-            case 'long':
-                jump = 4
-        match (direction):
-            case 'down':
-                self.focused_child = (self.focused_child + jump) % len(state.nodes)
-            case 'up':
-                self.focused_child = (self.focused_child - jump) % len(state.nodes)
-        state.nodes[self.focused_child].focus()
+        if len(state.nodes) > 0:
+            jump = 0
+            match (skip):
+                case 'short':
+                    jump = 1
+                case 'long':
+                    jump = 4
+            match (direction):
+                case 'down':
+                    self.focused_child = (self.focused_child + jump) % len(state.nodes)
+                case 'up':
+                    self.focused_child = (self.focused_child - jump) % len(state.nodes)
+            state.nodes[self.focused_child].focus()
 
     def action_toggle_input(self) -> None:
         input = self.query_one(Input)
         if input.has_focus:
             state = self.query(Checkbox)
-            state.nodes[self.focused_child].focus()
+            if len(state.nodes) > 0:
+                state.nodes[self.focused_child].focus()
         else:
             input.focus()
 
     def _on_focus(self, event: Focus) -> None:
         state = self.query(Checkbox)
-        state.nodes[self.focused_child].focus()
+        if len(state.nodes) > 0:
+            state.nodes[self.focused_child].focus()
         return super()._on_focus(event)
 
 
