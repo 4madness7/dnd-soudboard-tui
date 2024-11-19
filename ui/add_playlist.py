@@ -34,11 +34,6 @@ class AddPlaylist(Vertical):
 
     def action_move_focus(self, direction: Literal["up", "down"], skip: Literal["short", "long"]) -> None:
         state = self.query(Checkbox)
-        i = 0
-        while not state.nodes[i].has_focus:
-            if i >= len(state.nodes) - 1:
-                break
-            i += 1
         jump = 0
         match (skip):
             case 'short':
@@ -47,9 +42,9 @@ class AddPlaylist(Vertical):
                 jump = 4
         match (direction):
             case 'down':
-                self.focused_child = (i + jump) % len(state.nodes)
+                self.focused_child = (self.focused_child + jump) % len(state.nodes)
             case 'up':
-                self.focused_child = (i - jump) % len(state.nodes)
+                self.focused_child = (self.focused_child - jump) % len(state.nodes)
         state.nodes[self.focused_child].focus()
 
     def action_toggle_input(self) -> None:

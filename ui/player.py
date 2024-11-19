@@ -55,11 +55,6 @@ class SongQueue(ScrollableContainer):
 
     def action_move_focus(self, direction: Literal["up", "down"], skip: Literal["short", "long"]) -> None:
         state = self.query("Button")
-        i = 0
-        while not state.nodes[i].has_focus:
-            if i >= len(state.nodes) - 1:
-                break
-            i += 1
         jump = 0
         match (skip):
             case 'short':
@@ -68,7 +63,7 @@ class SongQueue(ScrollableContainer):
                 jump = 4
         match (direction):
             case 'down':
-                self.focused_child = (i + jump) % len(state.nodes)
+                self.focused_child = (self.focused_child + jump) % len(state.nodes)
             case 'up':
-                self.focused_child = (i - jump) % len(state.nodes)
+                self.focused_child = (self.focused_child - jump) % len(state.nodes)
         state.nodes[self.focused_child].focus()

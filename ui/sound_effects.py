@@ -21,20 +21,15 @@ class SoundEffects(ScrollableContainer):
 
     def action_move_focus(self, direction: Literal["up", "down", "left", "right"]) -> None:
         state = self.query(Button)
-        i = 0
-        while not state.nodes[i].has_focus:
-            if i >= len(state.nodes) - 1:
-                break
-            i += 1
         match (direction):
             case 'down':
-                self.focused_child = (i + 2) % len(state.nodes)
+                self.focused_child = (self.focused_child + 2) % len(state.nodes)
             case 'up':
-                self.focused_child = (i - 2) % len(state.nodes)
+                self.focused_child = (self.focused_child - 2) % len(state.nodes)
             case 'right':
-                self.focused_child = (i + 1) % len(state.nodes)
+                self.focused_child = (self.focused_child + 1) % len(state.nodes)
             case 'left':
-                self.focused_child = (i - 1) % len(state.nodes)
+                self.focused_child = (self.focused_child - 1) % len(state.nodes)
         state.nodes[self.focused_child].focus()
 
 
