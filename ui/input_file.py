@@ -5,6 +5,7 @@ import os
 
 from consts import DATA_PATH, FORMATS
 from data import Data
+from ui.add_playlist import SongChecklist
 from utils import copy_file
 
 class InputFile(Input):
@@ -47,7 +48,7 @@ class InputFile(Input):
                 f"Successfully copied {count_saved} audio files out of {len(media_files)}.",
                 severity="information"
             )
-            self.app.query_one("#saved-audios").update_table()
+            self.update_components()
 
         elif is_file and is_audio_file:
             copied, new_path = copy_file(input_path)
@@ -59,7 +60,7 @@ class InputFile(Input):
                     f"Successfully copied audio from \"{input_path}\" to \"{new_path}\"",
                     severity="information"
                 )
-                self.app.query_one("#saved-audios").update_table()
+                self.update_components()
 
             else:
                 self.app.notify(f"File \"{new_path}\" already exists", severity="error")
@@ -71,3 +72,7 @@ class InputFile(Input):
             elif not is_audio_file:
                 self.app.notify(f"Not a valid format. Valid formats: {FORMATS}", severity="error")
 
+    def update_components(self):
+        self.app.query_one(SongChecklist).refresh(recompose=True)
+        self.app.query_one("#saved-audios").update_table()
+        pass

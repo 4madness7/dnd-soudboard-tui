@@ -73,4 +73,4 @@ class SongChecklist(ScrollableContainer):
         indexes = map(lambda kv: kv[0], match)
 
         for i in indexes:
-            yield Checkbox(self.data.songs[i].name)
+            yield Checkbox(label=self.data.songs[i].name)
