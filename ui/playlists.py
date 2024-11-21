@@ -29,6 +29,12 @@ class Playlists(ScrollableContainer):
             title="Saved audios",
             id="saved-audios",
         )
+        for playlist in self.data.playlists:
+            yield PlaylistCollapsible(
+                data=self.data,
+                to_render=self.data.playlists[playlist],
+                title=playlist,
+            )
 
     def action_move_focus(self, direction: Literal["up", "down"], skip: Literal["short", "long"]) -> None:
         state = self.query(PlaylistCollapsibleTitle)

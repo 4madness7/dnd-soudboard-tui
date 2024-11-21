@@ -100,3 +100,18 @@ SoundEffects:focus-within > Button:focus {
 AddPlaylist:focus-within {
     background: black;
 }
+
+AddPlaylist > Label{
+    margin-top: 1;
+}
+
+SongChecklist {
+    overflow-x: hidden;
+}
+
+AddPlaylist Grid {
+    margin-top: 1;
+    grid-columns: 20 100%;
+    grid-rows: 2 90%;
+    grid-size: 2 2;
+}
