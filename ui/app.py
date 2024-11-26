@@ -5,6 +5,7 @@ from textual.widgets import ContentSwitcher
 
 from data import Data
 from ui.add_playlist import AddPlaylist
+from ui.edit_playlist import EditPlaylist
 from ui.input_file import InputFile
 from ui.player import Player, SongQueue, SongStatus
 from ui.playlists import Playlists
@@ -35,6 +36,7 @@ class DNDSoundBoard(App):
                 ContentSwitcher(
                     Playlists(data=self.data, id="playlists"),
                     AddPlaylist(data=self.data, id="add-playlist"),
+                    EditPlaylist(data=self.data, id="edit-playlist"),
                     classes="blue",
                     initial="playlists",
                 ),

@@ -2,11 +2,12 @@ from textual.app import ComposeResult
 from textual.containers import ScrollableContainer
 from textual.coordinate import Coordinate
 from textual.widget import Widget
-from textual.widgets import DataTable, Collapsible, _collapsible as clp
+from textual.widgets import ContentSwitcher, DataTable, Collapsible, _collapsible as clp
 from textual.events import Focus
 from textual.binding import Binding
 from typing import Literal
 from data import Data
+from ui.edit_playlist import EditPlaylist
 
 class Playlists(ScrollableContainer):
     BINDINGS = [
@@ -26,6 +27,7 @@ class Playlists(ScrollableContainer):
         yield PlaylistCollapsible(
             self.data,
             list(self.data.songs.keys()),
+            playlist_name="_saved_audios",
             title="Saved audios",
             id="saved-audios",
         )
@@ -33,6 +35,7 @@ class Playlists(ScrollableContainer):
             yield PlaylistCollapsible(
                 data=self.data,
                 to_render=self.data.playlists[playlist],
+                playlist_name=playlist,
                 title=playlist,
             )
 
@@ -63,9 +66,10 @@ class PlaylistCollapsible(Collapsible):
         Binding("n", "move_focus_song('down')", "Focus to next song in table", show=False),
         # This is temporary (maybe)
         Binding("enter", "no_bind", "Removed binding", show=False, priority=True),
+        Binding("e","edit_playlist","Open playlist edit", show=False)
     ]
 
-    def __init__(self, data: Data, to_render: list[int], *children: Widget, title: str = "Toggle", collapsed: bool = True, collapsed_symbol: str = "▶", expanded_symbol: str = "▼", name: str | None = None, id: str | None = None, classes: str | None = None, disabled: bool = False) -> None:
+    def __init__(self, data: Data, to_render: list[int], playlist_name: str, *children: Widget, title: str = "Toggle", collapsed: bool = True, collapsed_symbol: str = "▶", expanded_symbol: str = "▼", name: str | None = None, id: str | None = None, classes: str | None = None, disabled: bool = False) -> None:
         super().__init__(*children, title=title, collapsed=collapsed, collapsed_symbol=collapsed_symbol, expanded_symbol=expanded_symbol, name=name, id=id, classes=classes, disabled=disabled)
         self._title = PlaylistCollapsibleTitle(
             label=title,
@@ -73,6 +77,7 @@ class PlaylistCollapsible(Collapsible):
             expanded_symbol=expanded_symbol,
             collapsed=collapsed,
         )
+        self.playlist_name = playlist_name
         self.data = data
         self._table = DataTable(cursor_type="row")
         self._table.styles.width = "100"
@@ -84,6 +89,7 @@ class PlaylistCollapsible(Collapsible):
                 self._table.add_row(self.data.songs[i].name, self.data.songs[i].duration)
         self._table.sort(self.col_key_name, key=lambda name: name.lower())
         self.compose_add_child(self._table)
+
 
     def update_table(self):
         indexes = list(self.data.songs.keys())
@@ -106,6 +112,16 @@ class PlaylistCollapsible(Collapsible):
                 case 'up':
                     new_row = (self._table.cursor_coordinate.row - 1) % len(self._table.rows)
                     self._table.cursor_coordinate = Coordinate(new_row, 0)
+
+    def action_edit_playlist(self):
+        if self.playlist_name != "_saved_audios":
+            editor = self.app.query_one(EditPlaylist)
+            editor.load_playlist(self.playlist_name)
+            editor.refresh(recompose=True)
+            self.app.query_one(ContentSwitcher).current = "edit-playlist"
+            editor.focus()
+        else:
+            self.notify("Can't open edit for saved audios.", severity="warning")
 
     def action_no_bind(self):
         pass

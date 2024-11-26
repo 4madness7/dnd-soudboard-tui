@@ -19,6 +19,10 @@ Screen {
     display: block;
 }
 
+.w-100 {
+    width: 100;
+    height: 2;
+}
 
 Player {
     width: 25;
@@ -114,4 +118,31 @@ AddPlaylist Grid {
     grid-columns: 20 100%;
     grid-rows: 2 90%;
     grid-size: 2 2;
+}
+
+EditPlaylist {
+    width: 100%;
+    align: center top;
+}
+
+EditPlaylist Label {
+    margin-top: 1;
+}
+
+PlaylistTable {
+    margin-top: 1;
+    scrollbar-size-vertical: 1;
+    content-align: center top;
+    width: 100;
+    height: 10;
+}
+
+SaveStatus {
+    margin-top: 1;
+    margin-left: 1;
+    height: 1;
+}
+
+.save-warning {
+    color: #DD0000;
 }
