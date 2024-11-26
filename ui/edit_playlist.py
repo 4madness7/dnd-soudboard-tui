@@ -64,14 +64,22 @@ class EditPlaylist(Vertical):
     def check_change(self):
         self.query_one(SaveStatus).changes = self.data.playlists[self.playlist_name] != self.playlist
 
+    def refresh_playlist_table(self):
+        collapsibles = self.app.query_one("Playlists").query("PlaylistCollapsible")
+        for collap in collapsibles:
+            if collap.playlist_name == self.playlist_name:
+                collap.update_table()
+
     def action_save(self):
         status = self.query_one(SaveStatus)
         if status.changes:
             self.data.playlists[self.playlist_name] = self.playlist.copy()
             pickle.dump(self.data, open(DATA_PATH, 'wb'))
+            self.refresh_playlist_table()
             self.notify("Changes saved.")
         else:
             self.notify("No changes found, skipping.", severity="warning")
+        self.check_change()
 
     def action_move_focus(self, move: Literal["up", "down"]):
         tables = self.query(DataTable)

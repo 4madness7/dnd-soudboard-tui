@@ -2,7 +2,7 @@ from textual.app import ComposeResult
 from textual.containers import ScrollableContainer
 from textual.coordinate import Coordinate
 from textual.widget import Widget
-from textual.widgets import ContentSwitcher, DataTable, Collapsible, _collapsible as clp
+from textual.widgets import ContentSwitcher, DataTable, Collapsible, _collapsible as clp, data_table as dt
 from textual.events import Focus
 from textual.binding import Binding
 from typing import Literal
@@ -87,21 +87,46 @@ class PlaylistCollapsible(Collapsible):
                 self._table.add_row(self.data.songs[i].name[:83]+"...", self.data.songs[i].duration)
             else:
                 self._table.add_row(self.data.songs[i].name, self.data.songs[i].duration)
-        self._table.sort(self.col_key_name, key=lambda name: name.lower())
+        self.sort_table()
         self.compose_add_child(self._table)
+
+    def sort_table(self):
+        if self.playlist_name == "_saved_audios":
+            self._table.sort(self.col_key_name, key=lambda name: name.lower())
+        else:
+            self._table.sort(self.col_key_name, key=self.sort_key)
+
+    def sort_key(self, row : tuple[dt.RowKey, dict[dt.ColumnKey | str, dt.CellType]]):
+        def len_check(id: int):
+            if len(self.data.songs[id].name) > 86:
+                return (self.data.songs[id].name[:83]+"..", id)
+            return (self.data.songs[id].name, id)
+
+        id_dict = dict(map(len_check, self.data.playlists[self.playlist_name]))
+        index_dict = dict(map(lambda x: (self.data.playlists[self.playlist_name][x], x), range(len(self.data.playlists[self.playlist_name]))))
+        return index_dict[id_dict[row]]
 
 
     def update_table(self):
-        indexes = list(self.data.songs.keys())
-        titles = list(map(lambda x: x.strip(), list(self._table.get_column(self.col_key_name))))
-        for i in indexes:
-            if self.data.songs[i].name not in titles:
-                if len(self.data.songs[i].name) > 86:
-                    self._table.add_row(self.data.songs[i].name[:83]+"...", self.data.songs[i].duration)
-                else:
-                    self._table.add_row(self.data.songs[i].name, self.data.songs[i].duration)
-
-        self._table.sort(self.col_key_name, key=lambda name: name.lower())
+        if self.playlist_name == "_saved_audios":
+            indexes = list(self.data.songs.keys())
+            titles = list(map(lambda x: x.strip(), list(self._table.get_column(self.col_key_name))))
+            for i in indexes:
+                if self.data.songs[i].name not in titles:
+                    if len(self.data.songs[i].name) > 86:
+                        self._table.add_row(self.data.songs[i].name[:83]+"...", self.data.songs[i].duration)
+                    else:
+                        self._table.add_row(self.data.songs[i].name, self.data.songs[i].duration)
+        else:
+            indexes = self.data.playlists[self.playlist_name]
+            titles = list(map(lambda x: x.strip(), list(self._table.get_column(self.col_key_name))))
+            for i in indexes:
+                if self.data.songs[i].name not in titles:
+                    if len(self.data.songs[i].name) > 86:
+                        self._table.add_row(self.data.songs[i].name[:83]+"...", self.data.songs[i].duration)
+                    else:
+                        self._table.add_row(self.data.songs[i].name, self.data.songs[i].duration)
+        self.sort_table()
 
     def action_move_focus_song(self, direction: Literal["up", "down"]) -> None:
         if self._table.row_count > 0:
