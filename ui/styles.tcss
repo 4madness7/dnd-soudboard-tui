@@ -118,12 +118,12 @@ AddPlaylist Grid {
     grid-size: 2 2;
 }
 
-EditPlaylist {
+EditPlaylist, EditSoundBoard{
     width: 100%;
     align: center top;
 }
 
-EditPlaylist Label {
+EditPlaylist Label, EditSoundBoard Label {
     margin-top: 1;
 }
 
