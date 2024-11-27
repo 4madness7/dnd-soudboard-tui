@@ -3,7 +3,7 @@ from typing import Literal
 from consts import MEDIA_PATH
 
 class Data():
-    def __init__(self, songs = {}, playlists = {}, soundboard = []) -> None:
+    def __init__(self, songs = {}, playlists = {}, soundboard = {}) -> None:
         self.songs = songs
         self.playlists = playlists
         self.soundboard = soundboard
@@ -45,6 +45,7 @@ class Data():
                 lst = dict(map(lambda kv: (kv[1].file_name, kv[0]), self.songs.items()))
         return lst[key]
 
+    # TODO: you have to update this, remember you fooker
     def remove_song(self, key: int) -> None:
         self.songs.pop(key)
 

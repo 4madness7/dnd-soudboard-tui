@@ -1,38 +1,39 @@
 from textual.app import ComposeResult
-from textual.containers import ScrollableContainer
-from textual.widgets import Button
+from textual.containers import Vertical
+from textual.coordinate import Coordinate
+from textual.widgets import DataTable
 from textual.binding import Binding
 from textual.events import Focus
 from typing import Literal
 
-class SoundEffects(ScrollableContainer):
+class SoundEffects(Vertical):
     BINDINGS = [
         Binding("down,j", "move_focus('down')", "Focus sound under selected", show=False),
         Binding("up,k", "move_focus('up')", "Focus sound up selected", show=False),
-        Binding("left,h", "move_focus('left')", "Focus sound to the left of selected", show=False),
-        Binding("right,l", "move_focus('right')", "Focus sound to the right of selected", show=False),
     ]
 
-    focused_child = 0
+    can_focus = True
+    focused_row = 0
 
     def compose(self) -> ComposeResult:
+        table = DataTable(cursor_type="none")
+        table.add_columns("Key", "Name".ljust(24))
         for i in range(40):
-            yield Button(f"{i}", classes="effect")
+            table.add_row(f"{i}","Song name")
+        yield table
 
-    def action_move_focus(self, direction: Literal["up", "down", "left", "right"]) -> None:
-        state = self.query(Button)
-        match (direction):
-            case 'down':
-                self.focused_child = (self.focused_child + 2) % len(state.nodes)
-            case 'up':
-                self.focused_child = (self.focused_child - 2) % len(state.nodes)
-            case 'right':
-                self.focused_child = (self.focused_child + 1) % len(state.nodes)
-            case 'left':
-                self.focused_child = (self.focused_child - 1) % len(state.nodes)
-        state.nodes[self.focused_child].focus()
+    def action_move_focus(self, move: Literal["up", "down"]) -> None:
+        state = self.query_one(DataTable)
+        if state.row_count > 0:
+            match (move):
+                case 'down':
+                    new_row = (state.cursor_coordinate.row + 1) % len(state.rows)
+                    state.cursor_coordinate = Coordinate(new_row, 0)
+                case 'up':
+                    new_row = (state.cursor_coordinate.row - 1) % len(state.rows)
+                    state.cursor_coordinate = Coordinate(new_row, 0)
 
 
     def _on_focus(self, event: Focus) -> None:
-        self.children[self.focused_child].focus()
+        self.query_one(DataTable).cursor_type = "row"
         return super()._on_focus(event)

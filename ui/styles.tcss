@@ -56,19 +56,17 @@ QueuedSong {
     height: 3;
 }
 
-SongQueue, Playlists, SoundEffects, SongChecklist{
+SongQueue, Playlists, SoundEffects DataTable, SongChecklist{
     scrollbar-size-vertical: 1;
 }
 
 SoundEffects {
     width: 32;
-    layout: grid;
-    grid-size: 2;
-    grid-rows: 3;
 }
 
 .effect {
     height: 3;
+    width: 100%;
     border: round white;
 }
 
@@ -146,3 +144,5 @@ SaveStatus {
 .save-warning {
     color: #DD0000;
 }
+
+
