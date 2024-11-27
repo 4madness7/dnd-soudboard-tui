@@ -21,7 +21,7 @@ class EditPlaylist(Vertical):
 
     def __init__(self, data: Data,*children: Widget, name: str | None = None, id: str | None = None, classes: str | None = None, disabled: bool = False) -> None:
         self.data = data
-        self.playlist_name = list(self.data.playlists.keys())[0]
+        self.playlist_name = ""
         self.playlist = []
         self.focused_child = 0
         super().__init__(*children, name=name, id=id, classes=classes, disabled=disabled)
@@ -29,34 +29,37 @@ class EditPlaylist(Vertical):
     can_focus = True
 
     def compose(self) -> ComposeResult:
-        self.playlist = self.data.playlists[self.playlist_name].copy()
+        if self.playlist_name != "":
+            self.playlist = self.data.playlists[self.playlist_name].copy()
 
-        yield Horizontal(
-            Label(f"CurrentPlaylist: [b]{self.playlist_name}[/b] |"),
-            SaveStatus(),
-            classes="w-100"
-        )
+            yield Horizontal(
+                Label(f"CurrentPlaylist: [b]{self.playlist_name}[/b] |"),
+                SaveStatus(),
+                classes="w-100"
+            )
 
-        table = CurrentPlaylist(cursor_type="none", data=self.data ,playlist=self.playlist)
-        table.add_column("Song name".ljust(97))
-        for id in self.playlist:
-            if len(self.data.songs[id].name) > 97:
-                table.add_row((self.data.songs[id].name[:94]), key=id)
-            else:
-                table.add_row((self.data.songs[id].name), key=id)
-        yield table
+            table = CurrentPlaylist(cursor_type="none", data=self.data ,playlist=self.playlist)
+            table.add_column("Song name".ljust(97))
+            for id in self.playlist:
+                if len(self.data.songs[id].name) > 97:
+                    table.add_row((self.data.songs[id].name[:94]), key=id)
+                else:
+                    table.add_row((self.data.songs[id].name), key=id)
+            yield table
 
-        yield Label("Available Songs")
-        remaining_songs = list(set(self.data.songs.keys()) - set(self.playlist))
-        table = AvailableSongs(cursor_type="none", data=self.data, playlist=self.playlist)
-        col_key_name = table.add_column("Song name".ljust(97))
-        for id in remaining_songs:
-            if len(self.data.songs[id].name) > 97:
-                table.add_row((self.data.songs[id].name[:94]), key=id)
-            else:
-                table.add_row((self.data.songs[id].name), key=id)
-        table.sort(col_key_name, key=lambda name: name.lower())
-        yield table
+            yield Label("Available Songs")
+            remaining_songs = list(set(self.data.songs.keys()) - set(self.playlist))
+            table = AvailableSongs(cursor_type="none", data=self.data, playlist=self.playlist)
+            col_key_name = table.add_column("Song name".ljust(97))
+            for id in remaining_songs:
+                if len(self.data.songs[id].name) > 97:
+                    table.add_row((self.data.songs[id].name[:94]), key=id)
+                else:
+                    table.add_row((self.data.songs[id].name), key=id)
+            table.sort(col_key_name, key=lambda name: name.lower())
+            yield table
+        else:
+            yield Label("Playlist not loaded. Please try again.")
 
     def load_playlist(self, playlist_name: str):
         self.playlist_name = playlist_name
@@ -83,12 +86,13 @@ class EditPlaylist(Vertical):
 
     def action_move_focus(self, move: Literal["up", "down"]):
         tables = self.query(DataTable)
-        match (move):
-            case "up":
-                self.focused_child = (self.focused_child + 1) % len(tables)
-            case "down":
-                self.focused_child = (self.focused_child - 1) % len(tables)
-        tables[self.focused_child].focus()
+        if len(tables) > 0:
+            match (move):
+                case "up":
+                    self.focused_child = (self.focused_child + 1) % len(tables)
+                case "down":
+                    self.focused_child = (self.focused_child - 1) % len(tables)
+            tables[self.focused_child].focus()
 
     def _on_focus(self, event: Focus) -> None:
         self.query(DataTable)[self.focused_child].focus()
