@@ -99,7 +99,7 @@ class PlaylistCollapsible(Collapsible):
     def sort_key(self, row : tuple[dt.RowKey, dict[dt.ColumnKey | str, dt.CellType]]):
         def len_check(id: int):
             if len(self.data.songs[id].name) > 86:
-                return (self.data.songs[id].name[:83]+"..", id)
+                return (self.data.songs[id].name[:83]+"...", id)
             return (self.data.songs[id].name, id)
 
         id_dict = dict(map(len_check, self.data.playlists[self.playlist_name]))
@@ -126,6 +126,15 @@ class PlaylistCollapsible(Collapsible):
                         self._table.add_row(self.data.songs[i].name[:83]+"...", self.data.songs[i].duration)
                     else:
                         self._table.add_row(self.data.songs[i].name, self.data.songs[i].duration)
+
+            saved_titles = list(map(
+                        lambda x: x if len(x) <= 86 else x[:83]+"...",
+                        map(lambda x: self.data.songs[x].name.strip(), self.data.playlists[self.playlist_name])
+                    ))
+
+            for row in self._table.rows.copy():
+                if self._table.get_row(row)[0] not in saved_titles:
+                    self._table.remove_row(row)
         self.sort_table()
 
     def action_move_focus_song(self, direction: Literal["up", "down"]) -> None:
