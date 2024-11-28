@@ -45,9 +45,13 @@ class Data():
                 lst = dict(map(lambda kv: (kv[1].file_name, kv[0]), self.songs.items()))
         return lst[key]
 
-    # TODO: you have to update this, remember you fooker
     def remove_song(self, key: int) -> None:
         self.songs.pop(key)
+        for name in self.playlists:
+            if key in self.playlists[name]:
+                self.playlists[name].remove(key)
+        if key in self.soundboard:
+            self.soundboard.pop(key)
 
 
 class Song():
