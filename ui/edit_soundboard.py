@@ -3,7 +3,7 @@ from textual.containers import Horizontal, Vertical
 from textual.reactive import reactive
 from textual.widget import Widget
 from textual.app import ComposeResult
-from textual.widgets import data_table as dt, DataTable, Label
+from textual.widgets import Input, data_table as dt, DataTable, Label
 from textual.binding import Binding
 from textual.events import Focus
 import pickle
@@ -43,10 +43,12 @@ class EditSoundBoard(Vertical):
         table.add_columns("Key", "Sound name".ljust(COL_MAX_CHARS))
         for id in self.soundboard:
             if len(self.data.songs[id].name) > COL_MAX_CHARS:
-                table.add_row("N/A", self.data.songs[id].name[:STR_MAX_CHARS], key=str(id))
+                table.add_row(self.soundboard[id], self.data.songs[id].name[:STR_MAX_CHARS], key=str(id))
             else:
-                table.add_row("N/A", self.data.songs[id].name, key=str(id))
+                table.add_row(self.soundboard[id], self.data.songs[id].name, key=str(id))
         yield table
+
+        yield MacroEdit(data=self.data, soundboard=self.soundboard)
 
         yield Label("Available Songs")
         remaining_songs = list(set(self.data.songs.keys()) - set(self.soundboard.keys()))
@@ -91,6 +93,58 @@ class EditSoundBoard(Vertical):
         self.query(DataTable)[self.focused_child].focus()
         return super()._on_focus(event)
 
+class MacroEdit(Vertical):
+    def __init__(self, *children: Widget, data: Data, soundboard: dict[int, str] ,name: str | None = None, id: str | None = None, classes: str | None = None, disabled: bool = False) -> None:
+        self.data = data
+        self.soundboard = soundboard
+        super().__init__(*children, name=name, id=id, classes=classes, disabled=disabled)
+
+    BINDINGS = [
+        Binding("ctrl+f", "change_macro", "Change macro for current sound", show=False, priority=True)
+    ]
+
+    can_focus = True
+
+    def compose(self) -> ComposeResult:
+        yield Label("Change macro key ([b]ctrl+f[/b] to toggle focus, [b]enter[/b] to change macro)")
+        value = ""
+        if len(self.soundboard) > 0:
+            value = self.soundboard[list(self.soundboard.keys())[0]]
+        yield MacroInput(value=value, data=self.data, soundboard=self.soundboard)
+
+    def action_change_macro(self):
+        if self.parent:
+            self.parent.query_one(CurrentSoundboard).focus()
+
+    def _on_focus(self, event: Focus) -> None:
+        self.query_one(MacroInput).focus()
+        return super()._on_focus(event)
+
+class MacroInput(Input):
+    def __init__(self, data: Data, soundboard: dict[int, str] , value: str | None = None, placeholder: str = "", max_length: int = 0) -> None:
+        self.data = data
+        self.soundboard = soundboard
+        super().__init__(value, placeholder, None, False, restrict=None, type="text", max_length=max_length, suggester=None, validators=None, validate_on=None, valid_empty=True, name=None, id=None, classes=None, disabled=False, tooltip=None)
+
+    def on_input_submitted(self):
+        if self.value == "N/A" or len(self.value) == 1:
+            table = self.app.query_one(CurrentSoundboard)
+            key = table.find_key(table.cursor_row)
+            if key and key.value:
+                self.soundboard[int(key.value)] = self.value
+                table.remove_row(key)
+                if len(self.data.songs[int(key.value)].name) > COL_MAX_CHARS:
+                    table.add_row(self.soundboard[int(key.value)], self.data.songs[int(key.value)].name[:STR_MAX_CHARS], key=str(key.value))
+                else:
+                    table.add_row(self.soundboard[int(key.value)], self.data.songs[int(key.value)].name, key=str(key.value))
+                column_key = list(table.columns.keys())[1]
+                table.sort(column_key, key=lambda name: name.lower())
+                edit = self.app.query_one(EditSoundBoard)
+                edit.check_change()
+                edit.focus()
+        else:
+            self.notify("Input invalid. To remove macro use 'N/A'.", severity="error")
+
 class SaveStatus(Widget):
     changes = reactive(False)
 
@@ -108,8 +162,24 @@ class CurrentSoundboard(PlaylistTable):
         super().__init__(show_header=show_header, show_row_labels=show_row_labels, fixed_rows=fixed_rows, fixed_columns=fixed_columns, zebra_stripes=zebra_stripes, header_height=header_height, show_cursor=show_cursor, cursor_foreground_priority=cursor_foreground_priority, cursor_background_priority=cursor_background_priority, cursor_type=cursor_type, cell_padding=cell_padding, name=name, id=id, classes=classes, disabled=disabled)
 
     BINDINGS = [
-        Binding("r", "remove_selected", "Remove selected song from playlist", show=False)
+        Binding("p", "move_focus('up')", "Focus to previous song in table", show=False),
+        Binding("n", "move_focus('down')", "Focus to next song in table", show=False),
+        Binding("r", "remove_selected", "Remove selected song from playlist", show=False),
+        Binding("ctrl+f", "change_macro", "Change macro for current sound", show=False)
     ]
+
+    def action_move_focus(self, move: Literal['up', 'down']):
+        super().action_move_focus(move)
+        row_key = self.find_key(self.cursor_row)
+        if row_key and self.parent:
+            macro, _ = self.get_row(row_key)
+            self.parent.query_one(MacroInput).value = macro
+
+
+    def action_change_macro(self):
+        if self.parent:
+            input = self.parent.query_one(MacroEdit)
+            input.focus()
 
     def action_remove_selected(self):
         key = self.find_key(self.cursor_row)

@@ -50,23 +50,16 @@ class SoundEffects(Vertical):
 
     def update_table(self):
         table = self.query_one(DataTable)
+        for row in table.rows.copy():
+            table.remove_row(row)
+
         indexes = self.data.soundboard.keys()
-        titles = list(map(lambda x: x.strip(), list(table.get_column(self.col_key_name))))
         for i in indexes:
             new_title = self.data.songs[i].name
             if len(self.data.songs[i].name) > COL_MAX_CHARS:
                 new_title = self.data.songs[i].name[:STR_MAX_CHARS]
-            if new_title not in titles:
-                table.add_row(new_title, self.data.soundboard[i])
+            table.add_row(new_title, self.data.soundboard[i], key=str(i))
 
-        saved_titles = list(map(
-                    lambda x: x if len(x) <= COL_MAX_CHARS else x[:STR_MAX_CHARS],
-                    map(lambda x: self.data.songs[x].name.strip(), self.data.soundboard)
-                ))
-
-        for row in table.rows.copy():
-            if table.get_row(row)[0] not in saved_titles:
-                table.remove_row(row)
         table.sort(self.col_key_name, key=lambda name: name.lower())
 
     def action_open_edit(self):

@@ -145,4 +145,7 @@ SaveStatus {
     color: #DD0000;
 }
 
-
+MacroEdit {
+    height: 5;
+    width: 100;
+}
