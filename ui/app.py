@@ -3,6 +3,7 @@ from textual.binding import Binding
 from textual.containers import Horizontal
 from textual.widgets import ContentSwitcher
 
+from consts import MEDIA_PATH
 from data import Data
 from ui.add_playlist import AddPlaylist
 from ui.edit_playlist import EditPlaylist
@@ -12,10 +13,16 @@ from ui.player import Player, SongQueue, SongStatus
 from ui.playlists import Playlists
 from ui.sound_effects import SoundEffects
 
+import subprocess, os
+
 class DNDSoundBoard(App):
     def __init__(self, data: Data):
         self.data = data
         super().__init__(None, None, False, False)
+
+        for s in self.data.soundboard:
+            bind = Binding(self.data.soundboard[s], f"play_sound({s})", "play sound", show=False, priority=True)
+            self._bindings._add_binding(bind)
 
     CSS_PATH = "styles.tcss"
     # This allows to quit just by pressing q, I might have to change this later
@@ -50,6 +57,14 @@ class DNDSoundBoard(App):
                 placeholder="Insert path here (press ENTER to submit)",
                 classes="l2 none"
             )
+
+    def action_play_sound(self, id: int):
+        path = os.path.join(MEDIA_PATH, self.data.songs[id].file_name)
+        subprocess.Popen(
+            ["mpv",  path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT
+        )
 
     def action_test(self) -> None:
         player = self.query_one(SongStatus)
