@@ -63,8 +63,10 @@ class SoundEffects(Vertical):
         table.sort(self.col_key_name, key=lambda name: name.lower())
 
     def action_open_edit(self):
+        edit = self.app.query_one(EditSoundBoard)
+        edit.refresh(recompose=True)
         self.app.query_one(ContentSwitcher).current = "edit-soundboard"
-        self.app.query_one(EditSoundBoard).focus()
+        edit.focus()
 
     def watch_has_focus(self, value: bool) -> None:
         if value:
