@@ -1,3 +1,4 @@
+import os
 from textual.app import ComposeResult
 from textual.containers import ScrollableContainer
 from textual.coordinate import Coordinate
@@ -6,6 +7,7 @@ from textual.widgets import ContentSwitcher, DataTable, Collapsible, _collapsibl
 from textual.events import Focus
 from textual.binding import Binding
 from typing import Literal
+from consts import MEDIA_PATH, PLAYLIST_PATH
 from data import Data
 from ui.edit_playlist import EditPlaylist
 
@@ -15,6 +17,7 @@ class Playlists(ScrollableContainer):
         Binding("up,k", "move_focus('up', 'short')", "Focus to previous song", show=False),
         Binding("ctrl+down,ctrl+d", "move_focus('down', 'long')", "Focus to the 4th song after", show=False),
         Binding("ctrl+up,ctrl+u", "move_focus('up', 'long')", "Focus to the 4th song before", show=False),
+        Binding("ctrl+l", "load_selected_playlist", "Load selected playlist", show=False),
     ]
 
     focused_child = 0
@@ -38,6 +41,17 @@ class Playlists(ScrollableContainer):
                 playlist_name=playlist,
                 title=playlist,
             )
+
+    def action_load_selected_playlist(self):
+        to_load = self.query(PlaylistCollapsible)[self.focused_child]
+        if to_load.playlist_name != "_saved_audios":
+            self.notify(f"playlists loaded: {to_load.playlist_name}")
+            file_names: list[str] = list(map(lambda i: self.data.songs[i].file_name, self.data.playlists[to_load.playlist_name]))
+            file_paths: list[str] = list(map(lambda n: os.path.join(MEDIA_PATH, n), file_names))
+            with open(PLAYLIST_PATH, "w+") as file:
+                file.write("\n".join(file_paths))
+        else:
+            self.notify("Can't load saved audios.", severity="warning")
 
     def action_move_focus(self, direction: Literal["up", "down"], skip: Literal["short", "long"]) -> None:
         state = self.query(PlaylistCollapsibleTitle)

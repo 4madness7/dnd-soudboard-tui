@@ -4,3 +4,5 @@ __pycache__/
 media/
 
 data.pkl
+
+loaded.m3u

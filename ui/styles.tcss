@@ -87,6 +87,10 @@ SongQueue:focus-within {
     background: black;
 }
 
+SongQueue > Button {
+    width: 100%;
+}
+
 SongQueue:focus-within > Button:focus {
     background: red;
 }
