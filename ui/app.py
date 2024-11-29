@@ -20,10 +20,6 @@ class DNDSoundBoard(App):
         self.data = data
         super().__init__(None, None, False, False)
 
-        for s in self.data.soundboard:
-            bind = Binding(self.data.soundboard[s], f"play_sound({s})", "play sound", show=False, priority=True)
-            self._bindings._add_binding(bind)
-
     CSS_PATH = "styles.tcss"
     # This allows to quit just by pressing q, I might have to change this later
     BINDINGS = [
@@ -39,6 +35,10 @@ class DNDSoundBoard(App):
         ]
 
     def compose(self) -> ComposeResult:
+        for s in self.data.soundboard:
+            bind = Binding(self.data.soundboard[s], f"play_sound({s})", "play sound", show=False, priority=True)
+            self._bindings._add_binding(bind)
+
         yield Horizontal(
                 Player(),
                 ContentSwitcher(

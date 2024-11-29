@@ -75,6 +75,7 @@ class EditSoundBoard(Vertical):
             self.data.soundboard = self.soundboard.copy()
             pickle.dump(self.data, open(DATA_PATH, 'wb'))
             self.refresh_playlist_table()
+            self.app.refresh(recompose=True)
             self.notify("Changes saved.")
         else:
             self.notify("No changes found, skipping.", severity="warning")
