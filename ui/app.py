@@ -3,13 +3,13 @@ from textual.binding import Binding
 from textual.containers import Horizontal
 from textual.widgets import ContentSwitcher
 
-from consts import MEDIA_PATH
+from consts import MEDIA_PATH,PLAYLIST_PATH
 from data import Data
 from ui.add_playlist import AddPlaylist
 from ui.edit_playlist import EditPlaylist
 from ui.edit_soundboard import EditSoundBoard
 from ui.input_file import InputFile
-from ui.player import Player, SongQueue, SongStatus
+from ui.player import Player, SongQueue, SongStatus, SongTitle
 from ui.playlists import Playlists
 from ui.sound_effects import SoundEffects
 import os, mpv
@@ -18,6 +18,23 @@ class DNDSoundBoard(App):
     def __init__(self, data: Data):
         self.data = data
         self.sb_player = mpv.MPV()
+        self.curr_playlist = []
+        self.pl_player = mpv.MPV(loop_playlist="inf")
+        if os.path.exists(PLAYLIST_PATH):
+            with open(PLAYLIST_PATH, "r") as file:
+                lines = file.readlines()
+                if len(lines) > 0:
+                    for line in lines:
+                        self.pl_player.playlist_append(line.strip())
+        if len(self.pl_player.playlist_filenames) > 0:
+            self.pl_player.playlist_play_index(0)
+            self.pl_player.pause = True
+        @self.pl_player.property_observer('playlist-pos')
+        def _(_, i):
+            # Here, _value is either None if nothing is playing or a float containing
+            # fractional seconds since the beginning of the file.
+            song_title = self.pl_player.playlist_filenames[i].split(os.sep)[-1].split(".")[0]
+            self.app.query_one(SongTitle).song_title = song_title
         super().__init__(None, None, False, False)
 
     CSS_PATH = "styles.tcss"
@@ -25,13 +42,15 @@ class DNDSoundBoard(App):
     BINDINGS = [
             ("q", "quit", "Quit"),
 
-            ("space", "test", "TEST"),
+            ("space", "play_pause", "Play/pause current playlist"),
             ("ctrl+n", "toggle_input_file", "Open/close input file"),
 
             ("ctrl+q", "focus_queue", "Put focus on the queue pane"),
             Binding("ctrl+p", "focus_playlist", "Put focus on the playlist pane", priority=True),
             ("ctrl+s", "focus_soundboard", "Put focus on the soundboard pane"),
             ("ctrl+a", "add_playlist", "Add new playlist"),
+            (">", "next_song", "Move to next song in playlist"),
+            ("<", "prev_song", "Move to prev song in playlist"),
         ]
 
     def compose(self) -> ComposeResult:
@@ -40,7 +59,7 @@ class DNDSoundBoard(App):
             self._bindings._add_binding(bind)
 
         yield Horizontal(
-                Player(),
+                Player(player=self.pl_player),
                 ContentSwitcher(
                     Playlists(data=self.data, id="playlists"),
                     AddPlaylist(data=self.data, id="add-playlist"),
@@ -62,13 +81,26 @@ class DNDSoundBoard(App):
         path = os.path.join(MEDIA_PATH, self.data.songs[id].file_name)
         self.sb_player.play(path)
 
-    def action_test(self) -> None:
+    def action_play_pause(self) -> None:
+        self.pl_player.pause = not self.pl_player.pause
         player = self.query_one(SongStatus)
         player.toggle_class("playing")
         if "playing" in player.classes:
             player.status = "Playing"
         else:
             player.status = "Paused"
+
+    def action_next_song(self) -> None:
+        if self.pl_player.playlist_pos == len(self.pl_player.playlist_filenames) - 1:
+            self.pl_player.playlist_pos = 0
+        else:
+            self.pl_player.playlist_next()
+
+    def action_prev_song(self) -> None:
+        if self.pl_player.playlist_pos == 0:
+            self.pl_player.playlist_pos = len(self.pl_player.playlist_filenames) - 1
+        else:
+            self.pl_player.playlist_prev()
 
     def action_toggle_input_file(self) -> None:
         input_file = self.query_one(InputFile)

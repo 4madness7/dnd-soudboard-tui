@@ -1,5 +1,6 @@
 import os
 from typing import Literal
+from mpv import MPV
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import ScrollableContainer, Vertical
@@ -8,12 +9,14 @@ from textual.widgets import Button, Label
 from textual.reactive import reactive
 from textual.events import Focus
 
-from consts import PLAYLIST_PATH
-
 class Player(Vertical):
+    def __init__(self, *children: Widget, player: MPV,  name: str | None = None, id: str | None = None, classes: str | None = None, disabled: bool = False) -> None:
+        self.pl_player = player
+        super().__init__(*children, name=name, id=id, classes=classes, disabled=disabled)
+
     def compose(self) -> ComposeResult:
         yield MediaPlayer()
-        yield SongQueue()
+        yield SongQueue(player=self.pl_player)
 
 class MediaPlayer(Vertical):
 
@@ -36,6 +39,10 @@ class SongStatus(Widget):
         return f"{self.status}"
 
 class SongQueue(ScrollableContainer):
+    def __init__(self, *children: Widget, player: MPV, name: str | None = None, id: str | None = None, classes: str | None = None, disabled: bool = False) -> None:
+        self.pl_player = player
+        super().__init__(*children, name=name, id=id, classes=classes, disabled=disabled)
+
     BINDINGS = [
         Binding("down,j", "move_focus('down', 'short')", "Focus to next song", show=False),
         Binding("up,k", "move_focus('up', 'short')", "Focus to previous song", show=False),
@@ -46,17 +53,19 @@ class SongQueue(ScrollableContainer):
     focused_child = 0
 
     def compose(self) -> ComposeResult:
-        if os.path.exists(PLAYLIST_PATH):
-            with open(PLAYLIST_PATH, "r") as file:
-                lines = file.readlines()
-                if len(lines) == 0:
-                    yield Label("Playlist empty.")
-                else:
-                    for line in lines:
-                        song_name = line.split(os.sep)[-1].split(".")[0]
-                        yield Button(song_name)
+        first_song = "No song loaded"
+        if len(self.pl_player.playlist_filenames) > 0:
+            i = 0
+            for song in self.pl_player.playlist_filenames:
+                song_name = song.split(os.sep)[-1].split(".")[0]
+                if i == 0:
+                    first_song = song_name
+                    i += 1
+                yield Button(song_name)
         else:
             yield Label("Playlist empty.")
+        if self.parent:
+            self.parent.query_one(SongTitle).song_title = first_song
 
     def _on_focus(self, event: Focus) -> None:
         self.children[self.focused_child].focus()
