@@ -60,7 +60,7 @@ class DNDSoundBoard(App):
                     AddPlaylist(data=self.data, id="add-playlist"),
                     EditPlaylist(data=self.data, id="edit-playlist"),
                     EditSoundBoard(data=self.data, id="edit-soundboard"),
-                    classes="blue",
+                    classes="border-right-purple",
                     initial="playlists",
                 ),
                 SoundEffects(data=self.data),
