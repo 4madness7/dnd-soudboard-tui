@@ -50,6 +50,9 @@ class Playlists(ScrollableContainer):
             file_paths: list[str] = list(map(lambda n: os.path.join(MEDIA_PATH, n), file_names))
             with open(PLAYLIST_PATH, "w+") as file:
                 file.write("\n".join(file_paths))
+            if self.app.pl_player.pause == False:
+                self.app.action_play_pause()
+            self.app.load_playlist(refresh_player=True)
         else:
             self.notify("Can't load saved audios.", severity="warning")
 

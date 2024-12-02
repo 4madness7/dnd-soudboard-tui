@@ -20,12 +20,7 @@ class DNDSoundBoard(App):
         self.sb_player = mpv.MPV()
         self.curr_playlist = []
         self.pl_player = mpv.MPV(loop_playlist="inf")
-        if os.path.exists(PLAYLIST_PATH):
-            with open(PLAYLIST_PATH, "r") as file:
-                lines = file.readlines()
-                if len(lines) > 0:
-                    for line in lines:
-                        self.pl_player.playlist_append(line.strip())
+        self.load_playlist()
         if len(self.pl_player.playlist_filenames) > 0:
             self.pl_player.playlist_play_index(0)
             self.pl_player.pause = True
@@ -76,6 +71,19 @@ class DNDSoundBoard(App):
                 placeholder="Insert path here (press ENTER to submit)",
                 classes="l2 none"
             )
+
+    def load_playlist(self, refresh_player: bool = False):
+        self.pl_player.playlist_clear()
+        if len(self.pl_player.playlist_filenames) > 0:
+            self.pl_player.playlist_remove()
+        if os.path.exists(PLAYLIST_PATH):
+            with open(PLAYLIST_PATH, "r") as file:
+                lines = file.readlines()
+                if len(lines) > 0:
+                    for line in lines:
+                        self.pl_player.playlist_append(line.strip())
+        if refresh_player:
+            self.query_one(Player).refresh(recompose=True)
 
     def action_play_sound(self, id: int):
         path = os.path.join(MEDIA_PATH, self.data.songs[id].file_name)
