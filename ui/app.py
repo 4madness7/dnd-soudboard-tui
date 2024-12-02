@@ -12,13 +12,12 @@ from ui.input_file import InputFile
 from ui.player import Player, SongQueue, SongStatus
 from ui.playlists import Playlists
 from ui.sound_effects import SoundEffects
-from pygame import mixer
-import os
+import os, mpv
 
 class DNDSoundBoard(App):
     def __init__(self, data: Data):
-        mixer.init()
         self.data = data
+        self.sb_player = mpv.MPV()
         super().__init__(None, None, False, False)
 
     CSS_PATH = "styles.tcss"
@@ -61,8 +60,7 @@ class DNDSoundBoard(App):
 
     def action_play_sound(self, id: int):
         path = os.path.join(MEDIA_PATH, self.data.songs[id].file_name)
-        sound = mixer.Sound(path)
-        sound.play()
+        self.sb_player.play(path)
 
     def action_test(self) -> None:
         player = self.query_one(SongStatus)
