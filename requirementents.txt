@@ -4,11 +4,12 @@ linkify-it-py==2.0.3
 markdown-it-py==3.0.0
 mdit-py-plugins==0.4.2
 mdurl==0.1.2
+mutagen==1.47.0
 platformdirs==4.3.6
 pycparser==2.22
 pydub==0.25.1
-pygame==2.6.1
 Pygments==2.18.0
+python-mpv==1.0.7
 rich==13.9.3
 setuptools==75.6.0
 textual==0.85.1
