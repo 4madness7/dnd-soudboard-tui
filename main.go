@@ -33,8 +33,7 @@ func main() {
 
 	m := tui.MainModel{
 		List: tui.PlaylistModel{
-			List:     listItems,
-			Selected: 0,
+			List: listItems,
 		},
 	}
 

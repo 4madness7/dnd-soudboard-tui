@@ -59,7 +59,7 @@ type PlaylistModel struct {
 	List        []Item
 	maxHeight   int
 	maxWidth    int
-	Selected    int
+	selected    int
 	canRender   int
 	renderStart int
 	renderStop  int
@@ -74,13 +74,13 @@ func (m PlaylistModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "j", "down":
-			m.Selected = (m.Selected + 1) % len(m.List)
-			if m.Selected > m.renderStop {
+			m.selected = (m.selected + 1) % len(m.List)
+			if m.selected > m.renderStop {
 				m.renderStart++
 				m.renderStop++
 			}
-			if m.Selected == 0 && m.renderStart != 0 {
-				m.renderStart = m.Selected
+			if m.selected == 0 && m.renderStart != 0 {
+				m.renderStart = m.selected
 				if m.canRender >= len(m.List) {
 					m.renderStop = len(m.List) - 1
 				} else {
@@ -88,16 +88,16 @@ func (m PlaylistModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case "k", "up":
-			m.Selected--
-			if m.Selected < 0 {
-				m.Selected = len(m.List) - 1
+			m.selected--
+			if m.selected < 0 {
+				m.selected = len(m.List) - 1
 			}
-			if m.Selected < m.renderStart {
+			if m.selected < m.renderStart {
 				m.renderStart--
 				m.renderStop--
 			}
-			if m.Selected == len(m.List)-1 && m.renderStop != len(m.List)-1 {
-				m.renderStop = m.Selected
+			if m.selected == len(m.List)-1 && m.renderStop != len(m.List)-1 {
+				m.renderStop = m.selected
 				if m.canRender >= len(m.List) {
 					m.renderStart = 0
 				} else {
@@ -108,11 +108,13 @@ func (m PlaylistModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.canRender = m.maxHeight/3 - 1
 
-		m.renderStart = m.Selected
-		if m.canRender >= len(m.List) {
+		m.renderStop = m.renderStart + (m.canRender - 1)
+		if m.renderStop >= len(m.List) {
 			m.renderStop = len(m.List) - 1
-		} else {
-			m.renderStop = m.renderStart + m.canRender - 1
+		}
+		if m.selected >= m.renderStop {
+			m.renderStop = m.selected
+			m.renderStart = m.renderStop - m.canRender + 1
 		}
 	}
 	return m, nil
@@ -122,16 +124,19 @@ func (m PlaylistModel) View() string {
 	output := ""
 
 	for i := m.renderStart; i <= m.renderStop; i++ {
-		output += m.List[i].GetStyledOutput(i == m.Selected)
+		output += m.List[i].GetStyledOutput(i == m.selected)
 	}
 
-	if diff := m.maxHeight - len(strings.Split(output, "\n")); diff > 0 {
-		toAdd := ""
-		for i := 0; i < diff; i++ {
-			toAdd += "\n"
-		}
-		output += toAdd
-	}
+	diff := m.maxHeight - len(strings.Split(output, "\n"))
+	middlePoint := diff / 2
+	toAdd := fmt.Sprintf("Songs: %v/%v", m.selected+1, len(m.List))
+
+	toAdd = gloss.NewStyle().
+		PaddingTop(middlePoint).
+		PaddingBottom(middlePoint + 1).
+		Render(toAdd)
+
+	output += toAdd
 
 	return gloss.NewStyle().
 		Margin(0, 2).

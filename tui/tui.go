@@ -28,7 +28,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		m.width = msg.Width
 		m.List.maxHeight = m.height
-		m.List.maxWidth = 40
+		// m.List.maxWidth = 40
 	}
 
 	var cmd tea.Cmd
@@ -41,6 +41,15 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m MainModel) View() string {
 	current := gloss.NewStyle().
 		Padding(3, 6).
-		Render(fmt.Sprintf("Song selected: %v/%v\nW: %v | H: %v", m.List.Selected+1, len(m.List.List), m.width, m.height))
+		Render(
+			fmt.Sprintf(
+				"W: %v | H: %v\nSelected: %v | Start: %v | Stop: %v",
+				m.width,
+				m.height,
+				m.List.selected,
+				m.List.renderStart,
+				m.List.renderStop,
+			),
+		)
 	return gloss.JoinHorizontal(gloss.Top, m.List.View(), current)
 }
