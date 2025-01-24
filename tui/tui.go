@@ -28,7 +28,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		m.width = msg.Width
 		m.List.maxHeight = m.height
-		// m.List.maxWidth = 40
+		m.List.maxWidth = 40
 	}
 
 	var cmd tea.Cmd

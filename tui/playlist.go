@@ -10,6 +10,7 @@ import (
 
 type Item struct {
 	Title, Timer string
+	maxLen       int
 }
 
 func (i Item) GetTime() string {
@@ -30,6 +31,15 @@ func (i Item) GetStyledOutput(isSelected bool) string {
 	vMargin := 1
 	hMargin := 0
 
+	// doing this only after setting maxLen
+	titleToRender := i.Title
+	if i.maxLen > 0 {
+		titleDiff := len(i.Title) - i.maxLen
+		if titleDiff > 0 {
+			titleToRender = i.Title[:len(i.Title)-titleDiff-1] + "…"
+		}
+	}
+
 	if isSelected {
 		selectedBorderStyle := gloss.NewStyle().
 			BorderLeft(true).
@@ -39,7 +49,11 @@ func (i Item) GetStyledOutput(isSelected bool) string {
 			Margin(vMargin, hMargin)
 		selectedTitleStyle := gloss.NewStyle().Foreground(gloss.Color("#663399"))
 		selectedTimeStyle := gloss.NewStyle().Foreground(gloss.Color("#472471"))
-		styledText := fmt.Sprintf("%s\n%s", selectedTitleStyle.Render(i.Title), selectedTimeStyle.Render(i.GetTime()))
+		styledText := fmt.Sprintf(
+			"%s\n%s",
+			selectedTitleStyle.Render(titleToRender),
+			selectedTimeStyle.Render(i.GetTime()),
+		)
 		return selectedBorderStyle.Render(styledText)
 	}
 
@@ -51,7 +65,11 @@ func (i Item) GetStyledOutput(isSelected bool) string {
 
 	unselectedTitleStyle := gloss.NewStyle().Foreground(gloss.Color("#FFFFFF"))
 	unselectedTimeStyle := gloss.NewStyle().Foreground(gloss.Color("#AAAAAA"))
-	styledText := fmt.Sprintf("%s\n%s", unselectedTitleStyle.Render(i.Title), unselectedTimeStyle.Render(i.GetTime()))
+	styledText := fmt.Sprintf(
+		"%s\n%s",
+		unselectedTitleStyle.Render(titleToRender),
+		unselectedTimeStyle.Render(i.GetTime()),
+	)
 	return unselectedBorderStyle.Render(styledText)
 }
 
@@ -116,6 +134,10 @@ func (m PlaylistModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.renderStop = m.selected
 			m.renderStart = m.renderStop - m.canRender + 1
 		}
+
+		for i := range m.List {
+			m.List[i].maxLen = m.maxWidth - 8
+		}
 	}
 	return m, nil
 }
@@ -132,16 +154,20 @@ func (m PlaylistModel) View() string {
 	toAdd := fmt.Sprintf("Songs: %v/%v", m.selected+1, len(m.List))
 
 	toAdd = gloss.NewStyle().
+		MarginLeft(2).
 		PaddingTop(middlePoint).
 		PaddingBottom(middlePoint + 1).
 		Render(toAdd)
 
 	output += toAdd
 
+	hMargin := 1
+
 	return gloss.NewStyle().
-		Margin(0, 2).
+		Margin(0, hMargin).
 		BorderStyle(gloss.NormalBorder()).
 		BorderForeground(gloss.Color("#999999")).
 		BorderRight(true).
+		Width(m.maxWidth - hMargin*2).
 		Render(output)
 }

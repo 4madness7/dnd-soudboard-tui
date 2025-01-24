@@ -11,7 +11,7 @@ import (
 
 func main() {
 	listItems := []tui.Item{
-		{Title: "Song #1", Timer: "23:45"},
+		{Title: "Sooooooooooooooooooooooooooooooong #1", Timer: "23:45"},
 		{Title: "Song #2", Timer: "45"},
 		{Title: "Song #3", Timer: "2:23:45"},
 		{Title: "Song #4", Timer: "3:45"},
