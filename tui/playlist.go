@@ -130,6 +130,9 @@ func (m PlaylistModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.renderStop >= len(m.List) {
 			m.renderStop = len(m.List) - 1
 		}
+		if m.renderStart < 0 {
+			m.renderStart = 0
+		}
 		if m.selected >= m.renderStop {
 			m.renderStop = m.selected
 			m.renderStart = m.renderStop - m.canRender + 1
@@ -156,7 +159,7 @@ func (m PlaylistModel) View() string {
 	toAdd = gloss.NewStyle().
 		MarginLeft(2).
 		PaddingTop(middlePoint).
-		PaddingBottom(middlePoint + 1).
+		PaddingBottom(middlePoint - 1).
 		Render(toAdd)
 
 	output += toAdd

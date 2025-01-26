@@ -4,6 +4,7 @@ import (
 	"4madness7/dnd-soundboard-tui/tui"
 	"fmt"
 	"os"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	// gloss "github.com/charmbracelet/lipgloss"
@@ -34,6 +35,10 @@ func main() {
 	m := tui.MainModel{
 		List: tui.PlaylistModel{
 			List: listItems,
+		},
+		Player: tui.PlayerModel{
+			Num:  0,
+			Tick: 300 * time.Millisecond,
 		},
 	}
 
