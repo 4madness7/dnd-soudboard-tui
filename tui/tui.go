@@ -3,16 +3,18 @@ package tui
 import (
 	"fmt"
 
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	gloss "github.com/charmbracelet/lipgloss"
 )
 
 type MainModel struct {
-	width        int
-	height       int
 	List         PlaylistModel
 	Player       PlayerModel
+	ShortHelp    ShortHelpModel
 	lastKeyPress string
+	width        int
+	height       int
 }
 
 func (m MainModel) Init() tea.Cmd {
@@ -22,8 +24,8 @@ func (m MainModel) Init() tea.Cmd {
 func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "esc", "q":
+		switch {
+		case key.Matches(msg, mappings.Quit):
 			return m, tea.Quit
 		}
 		m.lastKeyPress = msg.String()
@@ -33,6 +35,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.List.maxHeight = m.height - 4
 		m.List.maxWidth = 40
 		m.Player.maxWidth = 40
+		m.ShortHelp.maxWidth = m.width - 40
 	case TickMsg:
 		var cmd tea.Cmd
 		var model tea.Model
@@ -62,9 +65,12 @@ func (m MainModel) View() string {
 				m.lastKeyPress,
 			),
 		)
-	return gloss.JoinHorizontal(
-		gloss.Top,
-		gloss.JoinVertical(gloss.Left, m.List.View(), m.Player.View()),
-		current,
+
+	topHalf := gloss.JoinHorizontal(gloss.Top, m.List.View(), current)
+	bottomHalf := gloss.JoinHorizontal(gloss.Top, m.Player.View(), m.ShortHelp.View())
+	return gloss.JoinVertical(
+		gloss.Left,
+		topHalf,
+		bottomHalf,
 	)
 }

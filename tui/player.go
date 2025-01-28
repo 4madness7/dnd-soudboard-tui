@@ -48,7 +48,7 @@ func (m PlayerModel) View() string {
 			Left:        "│",
 			Right:       "│",
 			TopLeft:     "",
-			TopRight:    "┤",
+			TopRight:    "┼",
 			BottomLeft:  "",
 			BottomRight: "",
 		}

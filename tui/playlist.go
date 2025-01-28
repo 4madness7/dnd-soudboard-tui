@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	gloss "github.com/charmbracelet/lipgloss"
 )
@@ -90,8 +91,8 @@ func (m PlaylistModel) Init() tea.Cmd {
 func (m PlaylistModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "j", "down":
+		switch {
+		case key.Matches(msg, mappings.Down):
 			m.selected = (m.selected + 1) % len(m.List)
 			if m.selected > m.renderStop {
 				m.renderStart++
@@ -105,7 +106,7 @@ func (m PlaylistModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.renderStop = m.renderStart + m.canRender - 1
 				}
 			}
-		case "k", "up":
+		case key.Matches(msg, mappings.Up):
 			m.selected--
 			if m.selected < 0 {
 				m.selected = len(m.List) - 1
