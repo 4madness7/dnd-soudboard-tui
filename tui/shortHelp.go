@@ -3,7 +3,6 @@ package tui
 import (
 	"github.com/charmbracelet/bubbles/help"
 	tea "github.com/charmbracelet/bubbletea"
-	gloss "github.com/charmbracelet/lipgloss"
 )
 
 type ShortHelpModel struct {
@@ -20,11 +19,5 @@ func (m ShortHelpModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ShortHelpModel) View() string {
-	return gloss.NewStyle().
-		Width(m.maxWidth).
-		Padding(1).
-		BorderStyle(gloss.NormalBorder()).
-		BorderTop(true).
-		BorderForeground(gloss.Color("#999999")).
-		Render(m.Helper.View(mappings))
+	return getStyledShortHelp(m.Helper.View(mappings), m.maxWidth)
 }

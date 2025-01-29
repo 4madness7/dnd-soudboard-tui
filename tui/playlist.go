@@ -6,7 +6,6 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
-	gloss "github.com/charmbracelet/lipgloss"
 )
 
 type Item struct {
@@ -27,12 +26,7 @@ func (i Item) GetTime() string {
 }
 
 func (i Item) GetStyledOutput(isSelected bool) string {
-	vPadding := 0
-	hPadding := 1
-	vMargin := 1
-	hMargin := 0
-
-	// doing this only after setting maxLen
+	// truncate text only after setting maxLen
 	titleToRender := i.Title
 	if i.maxLen > 0 {
 		titleDiff := len(i.Title) - i.maxLen
@@ -42,14 +36,6 @@ func (i Item) GetStyledOutput(isSelected bool) string {
 	}
 
 	if isSelected {
-		selectedBorderStyle := gloss.NewStyle().
-			BorderLeft(true).
-			BorderStyle(gloss.NormalBorder()).
-			BorderForeground(gloss.Color("#773388")).
-			Padding(vPadding, hPadding).
-			Margin(vMargin, hMargin)
-		selectedTitleStyle := gloss.NewStyle().Foreground(gloss.Color("#663399"))
-		selectedTimeStyle := gloss.NewStyle().Foreground(gloss.Color("#472471"))
 		styledText := fmt.Sprintf(
 			"%s\n%s",
 			selectedTitleStyle.Render(titleToRender),
@@ -58,14 +44,6 @@ func (i Item) GetStyledOutput(isSelected bool) string {
 		return selectedBorderStyle.Render(styledText)
 	}
 
-	unselectedBorderStyle := gloss.NewStyle().
-		BorderLeft(true).
-		BorderStyle(gloss.HiddenBorder()).
-		Padding(vPadding, hPadding).
-		Margin(vMargin, hMargin)
-
-	unselectedTitleStyle := gloss.NewStyle().Foreground(gloss.Color("#FFFFFF"))
-	unselectedTimeStyle := gloss.NewStyle().Foreground(gloss.Color("#AAAAAA"))
 	styledText := fmt.Sprintf(
 		"%s\n%s",
 		unselectedTitleStyle.Render(titleToRender),
@@ -157,21 +135,9 @@ func (m PlaylistModel) View() string {
 	middlePoint := diff / 2
 	toAdd := fmt.Sprintf("Songs: %v/%v", m.selected+1, len(m.List))
 
-	toAdd = gloss.NewStyle().
-		MarginLeft(2).
-		PaddingTop(middlePoint).
-		PaddingBottom(middlePoint - 1).
-		Render(toAdd)
+	toAdd = getStyledAddition(toAdd, middlePoint)
 
 	output += toAdd
 
-	hMargin := 1
-
-	return gloss.NewStyle().
-		Margin(0, hMargin).
-		BorderStyle(gloss.NormalBorder()).
-		BorderForeground(gloss.Color("#999999")).
-		BorderRight(true).
-		Width(m.maxWidth - hMargin*2).
-		Render(output)
+	return getStyledPlaylist(output, m.maxWidth)
 }

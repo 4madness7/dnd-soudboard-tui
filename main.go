@@ -6,10 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/charmbracelet/bubbles/help"
 	tea "github.com/charmbracelet/bubbletea"
-	gloss "github.com/charmbracelet/lipgloss"
-	// gloss "github.com/charmbracelet/lipgloss"
 )
 
 func main() {
@@ -34,16 +31,6 @@ func main() {
 		{Title: "Song #18", Timer: "3:45"},
 	}
 
-	helper := help.New()
-
-	// Defining styles for help menus
-	helper.Styles.FullKey = gloss.NewStyle().Inherit(helper.Styles.FullKey).Foreground(gloss.Color("#DDD"))
-	helper.Styles.ShortKey = gloss.NewStyle().Inherit(helper.Styles.ShortKey).Foreground(gloss.Color("#DDD"))
-	helper.Styles.FullDesc = gloss.NewStyle().Inherit(helper.Styles.FullDesc).Foreground(gloss.Color("#AAA"))
-	helper.Styles.ShortDesc = gloss.NewStyle().Inherit(helper.Styles.ShortDesc).Foreground(gloss.Color("#AAA"))
-	helper.Styles.FullSeparator = gloss.NewStyle().Inherit(helper.Styles.FullSeparator).Foreground(gloss.Color("#AAA"))
-	helper.Styles.ShortSeparator = gloss.NewStyle().Inherit(helper.Styles.ShortSeparator).Foreground(gloss.Color("#AAA"))
-
 	m := tui.MainModel{
 		List: tui.PlaylistModel{
 			List: listItems,
@@ -52,7 +39,7 @@ func main() {
 			Num:  0,
 			Tick: 300 * time.Millisecond,
 		},
-		ShortHelp: tui.ShortHelpModel{Helper: helper},
+		ShortHelp: tui.ShortHelpModel{Helper: tui.NewStyledHelper(false)},
 	}
 
 	p := tea.NewProgram(m, tea.WithAltScreen())
