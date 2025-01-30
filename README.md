@@ -1,7 +1,8 @@
 # dnd-soudboard-tui
 
 > [!WARNING]
-> This project will soon be rewritten in [go](https://go.dev/) using [Charm](https://charm.sh/) libraries.
+> This project is being rewritten in [go](https://go.dev/) using [Charm](https://charm.sh/) libraries.
+> For more info, check out the [go-rewrite](https://github.com/4madness7/dnd-soudboard-tui/tree/go-rewrite) branch
 
 Hello! This is my first personal project for [boot.dev](https://www.boot.dev).
 It was a painful but rewarding project, I kinda like how it turned out, but I'm not really happy with the performance and with the overall experience while coding this project.
