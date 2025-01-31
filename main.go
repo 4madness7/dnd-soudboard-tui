@@ -31,6 +31,8 @@ func main() {
 		{Title: "Song #18", Timer: "3:45"},
 	}
 
+	playlistsTab := tui.PlaylistsTabModel{}
+
 	m := tui.MainModel{
 		List: tui.PlaylistModel{
 			List: listItems,
@@ -41,8 +43,13 @@ func main() {
 		},
 		ShortHelp: tui.ShortHelpModel{Helper: tui.NewStyledHelper(false)},
 		Tabs: tui.TabsModel{
-			Titles:   []string{"title 1", "title 2", "title 3", "title 4", "title 5"},
-			Contents: []string{"content 1", "content 2", "content 3", "content 4", "content 5"},
+			Titles:        []string{"Playlists", "Soundboard", "Insert", "Edit", "Help"},
+			ActiveView:    playlistsTab,
+			PlaylistsTab:  playlistsTab,
+			SoundboardTab: tui.SoundboardTabModel{},
+			InsertTab:     tui.InsertTabModel{},
+			EditTab:       tui.EditTabModel{},
+			HelperTab:     tui.HelperTabModel{Helper: tui.NewStyledHelper(true)},
 		},
 	}
 

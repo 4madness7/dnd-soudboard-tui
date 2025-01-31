@@ -25,13 +25,16 @@ func (m MainModel) Init() tea.Cmd {
 func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		m.lastKeyPress = msg.String()
 		switch {
 		case key.Matches(msg, mappings.Quit):
 			return m, tea.Quit
-		}
-		m.lastKeyPress = msg.String()
-		switch msg.String() {
-		case "1", "2", "3", "4", "5":
+		case key.Matches(msg, mappings.Playlists.Binding),
+			key.Matches(msg, mappings.Soundboard.Binding),
+			key.Matches(msg, mappings.Insert.Binding),
+			key.Matches(msg, mappings.Edit.Binding),
+			key.Matches(msg, mappings.Helper.Binding):
+
 			var cmd tea.Cmd
 			var model tea.Model
 			model, cmd = m.Tabs.Update(msg)

@@ -72,10 +72,10 @@ var (
 				BorderTop(true).
 				BorderForeground(borderForeground)
 
-	// tabs.go
-    activeColor = gloss.Color("#F00")
-    activeTitleStyle = gloss.NewStyle().Padding(1).MarginLeft(1).Foreground(activeColor)
-    titleStyle = gloss.NewStyle().Padding(1).MarginLeft(1)
+		// tabs.go
+	activeColor      = gloss.Color("#F00")
+	activeTitleStyle = gloss.NewStyle().Padding(1).MarginLeft(1).Foreground(activeColor)
+	titleStyle       = gloss.NewStyle().Padding(1).MarginLeft(1)
 )
 
 // helper.go funcs

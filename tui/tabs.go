@@ -1,15 +1,21 @@
 package tui
 
 import (
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	gloss "github.com/charmbracelet/lipgloss"
 )
 
 type TabsModel struct {
-	maxWidth  int
-	Titles    []string
-	Contents  []string
-	activeTab int
+	PlaylistsTab  PlaylistsTabModel
+	SoundboardTab SoundboardTabModel
+	InsertTab     InsertTabModel
+	EditTab       EditTabModel
+	HelperTab     HelperTabModel
+	ActiveView    tea.Model
+	Titles        []string
+	maxWidth      int
+	activeTab     int
 }
 
 func (m TabsModel) Init() tea.Cmd {
@@ -17,20 +23,25 @@ func (m TabsModel) Init() tea.Cmd {
 }
 
 func (m TabsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-    switch msg := msg.(type) {
+	switch msg := msg.(type) {
 	case tea.KeyMsg:
-        switch msg.String() {
-        case "1":
-            m.activeTab = 0
-        case "2":
-            m.activeTab = 1
-        case "3":
-            m.activeTab = 2
-        case "4":
-            m.activeTab = 3
-        case "5":
-            m.activeTab = 4
-        }
+		switch {
+		case key.Matches(msg, mappings.Playlists.Binding):
+			m.activeTab = mappings.Playlists.index
+			m.ActiveView = m.PlaylistsTab
+		case key.Matches(msg, mappings.Soundboard.Binding):
+			m.activeTab = mappings.Soundboard.index
+			m.ActiveView = m.SoundboardTab
+		case key.Matches(msg, mappings.Insert.Binding):
+			m.activeTab = mappings.Insert.index
+			m.ActiveView = m.InsertTab
+		case key.Matches(msg, mappings.Edit.Binding):
+			m.activeTab = mappings.Edit.index
+			m.ActiveView = m.EditTab
+		case key.Matches(msg, mappings.Helper.Binding):
+			m.activeTab = mappings.Helper.index
+			m.ActiveView = m.HelperTab
+		}
 	}
 	return m, nil
 }
@@ -46,7 +57,7 @@ func (m TabsModel) View() string {
 		}
 	}
 
-	content := m.Contents[m.activeTab]
+	content := m.ActiveView.View()
 
 	return gloss.JoinVertical(gloss.Top, titles, content)
 }
