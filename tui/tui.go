@@ -12,6 +12,7 @@ type MainModel struct {
 	List         PlaylistModel
 	Player       PlayerModel
 	ShortHelp    ShortHelpModel
+	Tabs         TabsModel
 	lastKeyPress string
 	width        int
 	height       int
@@ -29,6 +30,14 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 		m.lastKeyPress = msg.String()
+		switch msg.String() {
+		case "1", "2", "3", "4", "5":
+			var cmd tea.Cmd
+			var model tea.Model
+			model, cmd = m.Tabs.Update(msg)
+			m.Tabs = model.(TabsModel)
+			return m, cmd
+		}
 	case tea.WindowSizeMsg:
 		m.height = msg.Height
 		m.width = msg.Width
@@ -66,7 +75,8 @@ func (m MainModel) View() string {
 			),
 		)
 
-	topHalf := gloss.JoinHorizontal(gloss.Top, m.List.View(), current)
+	test := gloss.JoinVertical(gloss.Top, m.Tabs.View(), current)
+	topHalf := gloss.JoinHorizontal(gloss.Top, m.List.View(), test)
 	bottomHalf := gloss.JoinHorizontal(gloss.Top, m.Player.View(), m.ShortHelp.View())
 	return gloss.JoinVertical(
 		gloss.Left,

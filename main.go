@@ -40,6 +40,10 @@ func main() {
 			Tick: 300 * time.Millisecond,
 		},
 		ShortHelp: tui.ShortHelpModel{Helper: tui.NewStyledHelper(false)},
+		Tabs: tui.TabsModel{
+			Titles:   []string{"title 1", "title 2", "title 3", "title 4", "title 5"},
+			Contents: []string{"content 1", "content 2", "content 3", "content 4", "content 5"},
+		},
 	}
 
 	p := tea.NewProgram(m, tea.WithAltScreen())
